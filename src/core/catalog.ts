@@ -126,9 +126,12 @@ export const HAZARDS: { id: HazardId; label: string; about: string }[] = [
   { id: 'environment', label: 'Hostile / closed environment', about: 'Cabin air, noise, light, temperature and microbes.' },
 ]
 
+// Dose rates are order-of-magnitude context values: Mars transit 1.8 and Mars surface
+// ~0.7 mSv/day from MSL/RAD (Zeitlin 2013, Hassler 2014); lunar surface ~1.4 mSv/day
+// from Chang'e-4 LND (Zhang 2020); low Earth orbit roughly 0.5-0.8 mSv/day.
 export const ENVIRONMENTS: MissionEnvironment[] = [
-  { id: 'leo', label: 'Space station (low Earth orbit)', commDelaySec: 0.5, gravityG: 0, typicalDoseMsvPerDay: 0.5 },
-  { id: 'lunar', label: 'Lunar surface base', commDelaySec: 1.3, gravityG: 0.165, typicalDoseMsvPerDay: 1.0 },
+  { id: 'leo', label: 'Space station (low Earth orbit)', commDelaySec: 0.5, gravityG: 0, typicalDoseMsvPerDay: 0.6 },
+  { id: 'lunar', label: 'Lunar surface base', commDelaySec: 1.3, gravityG: 0.165, typicalDoseMsvPerDay: 1.4 },
   { id: 'marsTransit', label: 'Mars transit vehicle', commDelaySec: 600, gravityG: 0, typicalDoseMsvPerDay: 1.8 },
   { id: 'marsSurface', label: 'Mars surface habitat', commDelaySec: 1200, gravityG: 0.38, typicalDoseMsvPerDay: 0.7 },
 ]

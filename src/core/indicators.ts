@@ -57,14 +57,17 @@ const SRC = {
     'NASA HRP, Risk of Inadequate Food and Nutrition — https://www.nasa.gov/reference/risk-of-inadequate-food-and-nutrition/',
   radiationHazard: 'NASA HRP, Hazard: Space Radiation — https://www.nasa.gov/hrp/hazard-space-radiation/',
   aasm: 'AASM/SRS consensus: adults need 7+ hours of sleep per night (Watson et al., 2015)',
-  aha: 'ACC/AHA 2017 blood pressure categories (Whelton et al., 2018)',
+  barger:
+    'Barger et al., Lancet Neurology 2014;13:904–912: astronauts averaged 6.09 h of sleep per night on ISS missions',
+  aha: '2025 AHA/ACC High Blood Pressure Guideline (Hypertension 2025;82:e212–e316): normal <120/80, stage 1 130–139 or 80–89, stage 2 ≥140 or ≥90, severe >180 and/or >120 mmHg',
   ahaHr: 'AHA: normal adult resting heart rate 60–100 bpm; lower is common in fit adults',
   ada: 'ADA Standards of Care: fasting glucose <100 normal, 100–125 prediabetes, ≥126 diabetes; <70 / <54 mg/dL hypoglycemia levels 1 / 2',
   spo2: 'Standard clinical reference: SpO2 95–100% normal at sea-level pressure',
   fever: 'Standard clinical reference: fever ≥38.0 °C; hypothermia <35.0 °C',
-  nasaStd: 'NASA-STD-3001 Vol. 1: career space radiation limit 600 mSv effective dose',
-  rad: 'Zeitlin et al., Science 2013 (MSL/RAD): ~1.8 mSv/day during cruise to Mars',
-  co2: 'Law et al., 2014 (ISS): headache risk rises with cabin CO2; NASA keeps average ppCO2 low single-digit mmHg',
+  nasaStd:
+    'NASA-STD-3001 Vol. 1: career effective dose from spaceflight radiation shall be less than 600 mSv; NASA OCHMO Radiation Protection technical brief',
+  rad: 'Zeitlin et al., Science 2013 (MSL/RAD): average 1.8 mSv/day during the cruise to Mars',
+  co2: 'NASA-STD-3001 Vol. 2 [V2 6004]: 1-hour average ppCO2 no more than 3 mmHg; NASA OCHMO-TB-004 Carbon Dioxide, citing Law et al.: 7-day average below 2.5 mmHg keeps headache risk under 1%',
 }
 
 export const INDICATORS: IndicatorDef[] = [
@@ -84,8 +87,8 @@ export const INDICATORS: IndicatorDef[] = [
       'No sensor? Enter the hours you slept when you wake up.',
     ],
     whyInSpace:
-      'Shifted schedules, workload, noise and unusual light cycles cut sleep short. Sleep loss lowers alertness and weakens immune defence.',
-    sources: [SRC.sleepRisk, SRC.aasm],
+      'Shifted schedules, workload, noise and unusual light cycles cut sleep short: astronauts average about 6 hours a night in flight. Sleep loss lowers alertness and weakens immune defence.',
+    sources: [SRC.sleepRisk, SRC.barger, SRC.aasm],
   },
   {
     id: 'restingHR',
@@ -267,7 +270,7 @@ export const INDICATORS: IndicatorDef[] = [
     minSpread: 0.2,
     howToMeasure: ['Read from your personal dosimeter. Keep it on your body at all times.'],
     whyInSpace:
-      'Beyond Earth’s magnetic field you are exposed to galactic cosmic rays and solar particle events. Dose adds up over the whole mission and raises cancer risk.',
+      'Beyond Earth’s magnetic field you are exposed to galactic cosmic rays and solar particle events. Dose adds up over the whole mission and raises cancer risk; a round trip to Mars alone can approach the career limit.',
     sources: [SRC.radiationHazard, SRC.rad, SRC.nasaStd],
   },
   {
@@ -279,7 +282,8 @@ export const INDICATORS: IndicatorDef[] = [
     region: 'lungs',
     hazards: ['environment'],
     badDirection: 'high',
-    bands: { watchHigh: 3, alertHigh: 4 },
+    // 2.5 mmHg: headache risk starts to rise (Law et al.). 3 mmHg: NASA's cabin limit.
+    bands: { watchHigh: 2.5, alertHigh: 3 },
     minSpread: 0.2,
     howToMeasure: ['Read from the cabin atmosphere monitor (24-hour average).'],
     whyInSpace:

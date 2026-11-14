@@ -3,6 +3,7 @@
 
 import { useMemo, useState } from 'react'
 import {
+  ENVIRONMENTS,
   INDICATOR_BY_ID,
   REGIONS,
   assess,
@@ -11,6 +12,7 @@ import {
   generateMission,
   roundTripDelayLabel,
   withEntries,
+  type MissionEnvironment,
   type Status,
 } from '../core'
 
@@ -28,7 +30,8 @@ function Badge({ status, children }: { status: Status; children: React.ReactNode
 }
 
 export default function Preview() {
-  const mission = useMemo(() => generateMission(), [])
+  const [envId, setEnvId] = useState<MissionEnvironment['id']>('marsTransit')
+  const mission = useMemo(() => generateMission({ envId }), [envId])
   const [crewId, setCrewId] = useState(mission.crew[0].id)
   const [day, setDay] = useState(mission.days)
 
@@ -44,6 +47,17 @@ export default function Preview() {
           {mission.name} · {mission.env.label} · ground reply {roundTripDelayLabel(mission.env)} round trip
         </p>
         <div className="flex flex-wrap items-center gap-3">
+          <select
+            className="rounded border px-2 py-1"
+            value={envId}
+            onChange={(e) => setEnvId(e.target.value as MissionEnvironment['id'])}
+          >
+            {ENVIRONMENTS.map((e) => (
+              <option key={e.id} value={e.id}>
+                {e.label}
+              </option>
+            ))}
+          </select>
           <select className="rounded border px-2 py-1" value={crewId} onChange={(e) => setCrewId(e.target.value)}>
             {mission.crew.map((c) => (
               <option key={c.id} value={c.id}>

@@ -31,9 +31,11 @@ src/App.tsx and src/index.css. Never edit src/core/.
    assessment, refresh } where mission = generateMission(), records = withEntries(crewId,
    mission.records[crewId]), assessment = assess(records, day, mission.env), all memoised.
    refresh() bumps a counter so records are re-read after saveEntry(). Default crewId 'fe1',
-   default day = mission.days.
+   default day = mission.days. Also hold envId (default 'marsTransit') and setEnvId, and create
+   the mission with generateMission({ envId }).
 2. src/ui/AppShell.tsx: top bar with the app name "Crew Recovery", mission name, environment label,
-   "Ground reply: <roundTripDelayLabel(env)> round trip", and a crew member selector. Below it,
+   "Ground reply: <roundTripDelayLabel(env)> round trip", an environment selector (ENVIRONMENTS)
+   and a crew member selector. Below it,
    tab navigation: Today, Body, Trends, Log, Crew. Simple state-based tabs, no router library.
    Each tab renders a placeholder component from src/ui/screens/ for now.
 3. src/ui/Timeline.tsx: a mission timeline scrubber fixed at the bottom: a slider from day 1 to
@@ -172,9 +174,9 @@ show the radiation event.
 - [x] Check-in tasks, streak, points
 - [x] Synthetic 120-day mission for four crew members
 - [x] Local storage of entries
-- [x] Tests (25)
-- [ ] Verify every threshold against its cited source and fix wording
-- [ ] Environment switch (station / Moon / Mars) affecting delay notes and radiation context
+- [x] Tests (27)
+- [x] Verify thresholds against sources (see `docs/SOURCES.md` for what was checked)
+- [x] Environment option (station / Moon / Mars) affecting radiation and delay notes
 - [ ] Demo script and 30-second video plan
 - [ ] Submission text, including the required description of AI tool use
 - [ ] Deploy the build to a public URL

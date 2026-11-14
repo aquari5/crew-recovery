@@ -53,7 +53,7 @@ const PROFILES: Profile[] = [
 
 export const MISSION_DAYS = 120
 const EVA_DAYS = new Set([20, 52, 71, 110])
-const CO2_EVENT: Record<number, number> = { 63: 3.4, 64: 3.9, 65: 4.4, 66: 3.5 }
+const CO2_EVENT: Record<number, number> = { 63: 3.1, 64: 3.9, 65: 4.4, 66: 3.3 }
 const SPE_DOSE: Record<number, number> = { 78: 12.4, 79: 5.1 }
 
 function addDays(iso: string, n: number): string {
@@ -67,7 +67,10 @@ const round = (v: number, d = 0) => {
   return Math.round(v * f) / f
 }
 
-function generateFor(p: Profile, seed: number, days: number, startDate: string): DailyRecord[] {
+/** How much of a deep-space solar particle event reaches the crew in each environment. */
+const SPE_FACTOR: Record<MissionEnvironment['id'], number> = { leo: 0.15, lunar: 1, marsTransit: 1, marsSurface: 0.4 }
+
+function generateFor(p: Profile, seed: number, days: number, startDate: string, env: MissionEnvironment): DailyRecord[] {
   const rnd = mulberry32(seed)
   const noise = (amp: number) => (rnd() * 2 - 1) * amp
   const chance = (prob: number) => rnd() < prob
@@ -87,7 +90,7 @@ function generateFor(p: Profile, seed: number, days: number, startDate: string):
     const co2Event = CO2_EVENT[day]
 
     // ── Night that ended this morning: driven by YESTERDAY's behaviours ────
-    const co2 = round(co2Event ?? 2.2 + noise(0.3), 1)
+    const co2 = round(co2Event ?? 1.9 + noise(0.3), 1)
     let sleep =
       p.sleepNeed - 0.5 + noise(0.45) -
       (prev.caffeineLate ? 0.6 : 0) -
@@ -151,7 +154,10 @@ function generateFor(p: Profile, seed: number, days: number, startDate: string):
       hrv,
       spo2,
       co2,
-      radiation: round(SPE_DOSE[day] ?? 1.8 + noise(0.25), 1),
+      radiation: round(
+        SPE_DOSE[day] ? SPE_DOSE[day] * SPE_FACTOR[env.id] + env.typicalDoseMsvPerDay : env.typicalDoseMsvPerDay * (1 + noise(0.14)),
+        1,
+      ),
       bpSys: round(p.sys + 0.8 * debt + noise(4)),
       bpDia: round(p.dia + 0.5 * debt + noise(3)),
       temp,
@@ -208,15 +214,31 @@ function generateFor(p: Profile, seed: number, days: number, startDate: string):
   return out
 }
 
-export function generateMission(seed = 2026, days = MISSION_DAYS): MissionData {
+const MISSION_NAME: Record<MissionEnvironment['id'], string> = {
+  leo: 'Station expedition',
+  lunar: 'Lunar surface stay',
+  marsTransit: 'Mars transit',
+  marsSurface: 'Mars surface stay',
+}
+
+export interface MissionOptions {
+  seed?: number
+  days?: number
+  /** Where the crew is. Changes the radiation background, the event dose and the communication delay. */
+  envId?: MissionEnvironment['id']
+}
+
+export function generateMission(options: MissionOptions = {}): MissionData {
+  const { seed = 2026, days = MISSION_DAYS, envId = 'marsTransit' } = options
+  const env = ENVIRONMENT_BY_ID[envId]
   const startDate = '2039-07-18'
   const records: Record<string, DailyRecord[]> = {}
   PROFILES.forEach((p, i) => {
-    records[p.id] = generateFor(p, seed + i * 7919, days, startDate)
+    records[p.id] = generateFor(p, seed + i * 7919, days, startDate, env)
   })
   return {
-    name: 'Mars transit',
-    env: ENVIRONMENT_BY_ID.marsTransit,
+    name: MISSION_NAME[envId],
+    env,
     startDate,
     days,
     crew: PROFILES.map(({ id, name, role }) => ({ id, name, role })),

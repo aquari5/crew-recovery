@@ -7,7 +7,7 @@
 export type * from './types'
 
 export { assess, topLevel } from './assess'
-export { generateMission, MISSION_DAYS, type MissionData } from './mission'
+export { generateMission, MISSION_DAYS, type MissionData, type MissionOptions } from './mission'
 export { withEntries, saveEntry, clearEntries, applyPatch, type EntryPatch } from './storage'
 
 export {

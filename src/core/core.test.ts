@@ -156,7 +156,7 @@ describe('findFindings', () => {
     expect(f?.level).toBe(2)
   })
 
-  it('sends a hypertensive crisis to the ground and adds the delay note', () => {
+  it('sends severely high blood pressure to the ground and adds the delay note', () => {
     const recs = days(1, () => ({ values: { bpSys: 185, bpDia: 100 } }))
     const f = findFindings(recs, 1, env)[0]
     expect(f.id).toBe('bp-crisis')
@@ -165,6 +165,13 @@ describe('findFindings', () => {
     // Near Earth there is no meaningful delay, so no note.
     const leo = findFindings(recs, 1, ENVIRONMENT_BY_ID.leo)[0]
     expect(leo.actions.at(-1)).not.toContain('round trip')
+  })
+
+  it('grades cabin CO2 against the 2.5 and 3 mmHg limits', () => {
+    const at = (co2: number) => findFindings(days(1, () => ({ values: { co2 } })), 1, env).find((f) => f.id === 'co2-high')
+    expect(at(2.2)).toBeUndefined()
+    expect(at(2.7)?.level).toBe(1)
+    expect(at(3.2)?.level).toBe(2)
   })
 
   it('raises red-flag symptoms without any abnormal number', () => {
@@ -232,6 +239,20 @@ describe('demo mission', () => {
     expect(topLevel(assess(me, 78, m.env).findings)).toBe(3)
     expect(ids(92)).toContain('exercise-low')
     expect(ids(120)).toContain('mood-low')
+  })
+
+  it('adapts radiation and the communication delay to the environment', () => {
+    const dose = (envId: 'leo' | 'marsTransit') => {
+      const mm = generateMission({ envId })
+      return { a: assess(mm.records.fe1, 78, mm.env), env: mm.env }
+    }
+    const mars = dose('marsTransit')
+    const leo = dose('leo')
+    expect(mars.a.radiation.cumulativeMsv).toBeGreaterThan(leo.a.radiation.cumulativeMsv * 2)
+    expect(topLevel(mars.a.findings)).toBe(3)
+    // Inside Earth's magnetic field the same solar event is a smaller dose and no shelter order.
+    expect(leo.a.findings.find((f) => f.id === 'radiation-event')?.level ?? 0).toBeLessThan(3)
+    expect(leo.env.commDelaySec).toBeLessThan(1)
   })
 
   it('lets the correlation engine recover the built-in effects', () => {

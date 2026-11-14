@@ -88,12 +88,12 @@ const rules: Rule[] = [
     const sys = c.latest('bpSys', 1)
     const dia = c.latest('bpDia', 1)
     if (sys == null && dia == null) return null
-    if ((sys ?? 0) >= 180 || (dia ?? 0) >= 120) {
+    if ((sys ?? 0) > 180 || (dia ?? 0) > 120) {
       return {
         id: 'bp-crisis',
         level: 3,
-        title: 'Very high blood pressure',
-        why: `Latest reading ${sys ?? '—'}/${dia ?? '—'} mmHg is in the hypertensive crisis range (180/120 or above).`,
+        title: 'Severely high blood pressure',
+        why: `Latest reading ${sys ?? '—'}/${dia ?? '—'} mmHg is in the severe range (above 180/120).`,
         actions: [
           'Rest for 5 minutes and repeat the measurement.',
           'If it is still this high, call the Crew Medical Officer immediately.',
@@ -329,13 +329,13 @@ const rules: Rule[] = [
   // ── Cabin CO2 ────────────────────────────────────────────────────────────
   (c) => {
     const v = c.latest('co2', 0)
-    if (v == null || v < 3) return null
+    if (v == null || v < 2.5) return null
     const headache = c.hasSymptom('headache', 2)
     return {
       id: 'co2-high',
-      level: v >= 4 || headache ? 2 : 1,
-      title: 'Cabin CO₂ is elevated',
-      why: `Cabin CO₂ is ${fmt(v, 1)} mmHg${headache ? ' and you logged a headache' : ''}. Raised CO₂ causes headaches, poor sleep and slower thinking.`,
+      level: v >= 3 || headache ? 2 : 1,
+      title: v >= 3 ? 'Cabin CO₂ is above the limit' : 'Cabin CO₂ is elevated',
+      why: `Cabin CO₂ is ${fmt(v, 1)} mmHg${headache ? ' and you logged a headache' : ''}. NASA's cabin limit is 3 mmHg, and headache risk rises from about 2.5 mmHg.`,
       actions: [
         'Tell the crew and check the CO₂ removal system.',
         'Increase ventilation where you work and sleep; avoid dead-air corners.',

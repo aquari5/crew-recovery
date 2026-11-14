@@ -24,22 +24,25 @@ NASA HRP pages used for specific indicators and rules:
 - ARCHeR (wrist actigraphy on Artemis II): https://www.nasa.gov/reference/archer/
 - Spaceflight Standard Measures: https://www.nasa.gov/reference/standard-measures/
 
-## Clinical reference values behind the thresholds
+## Reference values behind the thresholds
 
-Status: **to be verified against the original documents before submission** (task in `docs/TASKS.md`). The values in `src/core/indicators.ts` were written from general clinical knowledge.
+Thresholds live in `src/core/indicators.ts`. "Checked" means the value was compared with the cited document or an official summary of it on 14 November 2026. "Textbook" means a standard clinical value that was not re-checked against a primary document.
 
-| Indicator | Thresholds used | Reference |
-|---|---|---|
-| Sleep | watch < 6.5 h, alert ≤ 5 h | AASM/SRS consensus statement, Watson et al. 2015 (adults: 7+ h) |
-| Blood pressure | watch ≥ 130/80, alert ≥ 140/90, crisis ≥ 180/120, low ≤ 90 systolic | 2017 ACC/AHA guideline, Whelton et al. 2018 |
-| Resting heart rate | watch ≥ 90 or < 45, alert ≥ 100 or ≤ 40 bpm | American Heart Association (60–100 bpm; lower in fit adults) |
-| Blood oxygen | watch < 95%, alert ≤ 91% | Standard clinical reference range |
-| Body temperature | watch ≥ 37.5 °C, alert ≥ 38.0 °C or ≤ 35.0 °C | Standard clinical definitions of fever and hypothermia |
-| Fasting glucose | watch ≥ 100 or < 70, alert ≥ 126 or ≤ 54 mg/dL | American Diabetes Association, Standards of Care |
-| Body mass | watch −5%, alert −10% from mission start | Common clinical criteria for significant unintentional weight loss |
-| Radiation | career limit 600 mSv; typical deep-space dose ~1.8 mSv/day | NASA-STD-3001 Vol. 1; Zeitlin et al., Science 2013 (MSL/RAD) |
-| Cabin CO₂ | watch ≥ 3 mmHg, alert ≥ 4 mmHg | Law et al. 2014 (headache and CO₂ on the ISS) |
-| HRV | personal baseline only | No population threshold is meaningful |
+| Indicator | Thresholds used | Reference | Status |
+|---|---|---|---|
+| Blood pressure | watch ≥ 130/80, alert ≥ 140/90, severe > 180/120, low ≤ 90 systolic | 2025 AHA/ACC High Blood Pressure Guideline, Hypertension 2025;82(10):e212–e316 (categories unchanged from 2017) | Checked |
+| Fasting glucose | watch ≥ 100 or < 70, alert ≥ 126 or ≤ 54 mg/dL | American Diabetes Association, Standards of Care: prediabetes 100–125 mg/dL; hypoglycemia level 1 < 70, level 2 < 54 mg/dL | Checked, except the ≥ 126 diabetes criterion (textbook) |
+| Cabin CO₂ | watch ≥ 2.5 mmHg, alert ≥ 3 mmHg | NASA-STD-3001 Vol. 2 [V2 6004]: 1-hour average ≤ 3 mmHg; NASA OCHMO-TB-004 Carbon Dioxide, citing Law et al.: 7-day average < 2.5 mmHg keeps headache risk under 1% | Checked |
+| Radiation | career limit 600 mSv; deep-space background 1.8 mSv/day | NASA-STD-3001 Vol. 1 and NASA OCHMO Radiation Protection technical brief; Zeitlin et al., Science 2013 (MSL/RAD) | Checked |
+| Sleep | watch < 6.5 h, alert ≤ 5 h; "about 6 h a night in flight" | AASM/SRS consensus, Watson et al. 2015 (adults: 7+ h); Barger et al., Lancet Neurology 2014;13:904–912 (6.09 h on ISS) | Barger checked via press material; AASM textbook; the 6.5 h and 5 h cut-offs are our own screening choices |
+| Resting heart rate | watch ≥ 90 or < 45, alert ≥ 100 or ≤ 40 bpm | American Heart Association: 60–100 bpm, lower in fit adults | Textbook; the lower cut-offs are our own choice for a fit crew |
+| Blood oxygen | watch < 95%, alert ≤ 91% | Standard clinical reference range | Textbook |
+| Body temperature | watch ≥ 37.5 °C, alert ≥ 38.0 °C or ≤ 35.0 °C | Standard clinical definitions of fever and hypothermia | Textbook |
+| Body mass | watch −5%, alert −10% from mission start | Common clinical criteria for significant unintentional weight loss | Textbook |
+| HRV | personal baseline only | No population threshold is meaningful | — |
+| Environment dose rates | LEO 0.6, lunar surface 1.4, Mars surface 0.7 mSv/day | Mars surface 0.67 mSv/day: Hassler et al., Science 2014 (MSL/RAD); lunar: Zhang et al., Science Advances 2020 (Chang'e-4 LND); LEO: typical published range | Mars surface checked; lunar and LEO not re-checked, used as context only |
+
+Links: [NASA OCHMO-TB-004 Carbon Dioxide](https://www.nasa.gov/wp-content/uploads/2023/12/ochmo-tb-004-carbon-dioxide.pdf) · [NASA OCHMO Radiation Protection brief](https://www.nasa.gov/wp-content/uploads/2023/03/radiation-protection-technical-brief-ochmo.pdf) · [SwRI on MSL/RAD cruise dose](https://www.swri.org/newsroom/press-releases/swri-led-team-calculates-the-radiation-exposure-associated-trip-mars) · [Barger et al. press release](https://www.eurekalert.org/news-releases/595450) · [ADA hypoglycemia levels](https://professional.diabetes.org/sites/dpro/files/2025-05/hypoglycemia-hcp-5-27-25.pdf) · [2025 AHA/ACC guideline quick reference](https://www.2minutemedicine.com/guidelines/high-blood-pressure/)
 
 ## Data
 

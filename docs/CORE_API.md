@@ -11,13 +11,14 @@ A complete working example is `src/dev/Preview.tsx`.
 ## The three calls you need
 
 ```ts
-const mission = generateMission()                 // demo data, same on every machine
+const mission = generateMission({ envId })        // demo data, same on every machine
 const records = withEntries(crewId, mission.records[crewId])  // + what the user typed in
 const a = assess(records, day, mission.env)       // everything for one person on one day
 ```
 
 - `mission.crew` — `{ id, name, role }[]` (4 people; `fe1` "Alex Rivera" is the main character).
 - `mission.days` — 120. `day` is 1-based. Any day from 1 to 120 can be assessed, which is how the timeline scrubber works.
+- `envId` is optional: `'leo' | 'lunar' | 'marsTransit' | 'marsSurface'` (default `'marsTransit'`). It changes the radiation background, the size of the solar event and the communication delay. List the choices from `ENVIRONMENTS`.
 - `mission.env` — where the crew is (`label`, `commDelaySec`, `gravityG`). `roundTripDelayLabel(env)` gives `"20 min"`.
 - Wrap the calls in `useMemo`; `assess` is cheap but not free.
 
