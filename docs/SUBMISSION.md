@@ -123,16 +123,16 @@ The guide plays muted until the viewer turns the sound on, so the captions carry
 
 | Start | Line |
 |---|---|
-| 0.0 | Today. Start here each morning. |
+| 0.0 | Each morning, this is where you start. |
 | 3.8 | The cards say what to do, and who to involve. |
-| 7.4 | Timeline. Drag to revisit any mission day. |
-| 11.8 | Or press Story for the key moments. |
-| 14.8 | Log. Two minutes: how you feel, what you did, your measurements. |
+| 7.4 | Drag the timeline to revisit any mission day, |
+| 11.8 | or press Story for the key moments. |
+| 14.8 | Log how you feel, what you did and your measurements in two minutes. |
 | 19.8 | Blood pressure has a guided mode. |
-| 22.8 | Body. Select a region to see its signals. |
-| 28.6 | Trends. See what helps or hurts your recovery. |
-| 32.2 | Ground report. One button writes the message to Earth. |
-| 37.0 | You are set. |
+| 22.8 | Select a body region to see every signal, |
+| 28.6 | and open Trends to see what helps and what hurts your recovery. |
+| 32.2 | One click writes the message to Earth. |
+| 37.0 | You're set. |
 
 ## What comes next
 
