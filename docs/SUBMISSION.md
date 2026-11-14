@@ -63,6 +63,8 @@ See "Use of AI tools" in `docs/SOURCES.md`. Claude (Anthropic) and Codex (OpenAI
 
 ## Demo script (30 seconds)
 
+A recorded version with captions is in `docs/demo.mp4` (1920×1080, 30 s, no sound).
+
 | Time | Screen | Narration |
 |---|---|---|
 | 0–4 s | Today, day 30, green | "On the way to Mars a doctor is 20 minutes away. Crew Recovery tells an astronaut how they are, every morning." |
