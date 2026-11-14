@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import {
   INDICATOR_BY_ID,
   REGION_BY_ID,
@@ -9,15 +9,17 @@ import {
   type DailyRecord,
   type IndicatorResult,
 } from '../../core'
+import Mannequin, { project, type Glow, type Vec3 } from '../Mannequin'
 import { useMission } from '../state'
 import { STATUS, StatusBadge } from '../status'
+import { useReducedMotion } from '../useReducedMotion'
 
 const LEVEL = { 1: 'Self-care', 2: 'Crew Medical Officer', 3: 'Flight surgeon' } as const
 const TREND = { up: '↑ Rising', down: '↓ Falling', flat: '→ Stable', none: '' } as const
 
 /**
- * Stylised figure built from a few rounded shapes: a head, a torso and limbs
- * drawn as thick round-capped strokes. Deliberately a pictogram, not anatomy.
+ * Flat fallback figure for browsers without WebGL: a head, a torso and limbs
+ * drawn as thick round-capped strokes.
  */
 function Figure() {
   return (
@@ -41,17 +43,25 @@ function Figure() {
   )
 }
 
-/** Where each region's marker sits on the figure and which side its label goes. */
-const SPOTS: { id: BodyRegionId; x: number; y: number; side: 'left' | 'right'; label: string }[] = [
-  { id: 'head', x: 160, y: 62, side: 'left', label: 'Brain & sleep' },
-  { id: 'eyes', x: 171, y: 80, side: 'right', label: 'Eyes' },
-  { id: 'wholeBody', x: 262, y: 122, side: 'right', label: 'Radiation' },
-  { id: 'lungs', x: 136, y: 168, side: 'left', label: 'Air' },
-  { id: 'heart', x: 176, y: 186, side: 'right', label: 'Heart' },
-  { id: 'gut', x: 160, y: 252, side: 'left', label: 'Nutrition' },
-  { id: 'skin', x: 242, y: 262, side: 'right', label: 'Immune & skin' },
-  { id: 'musculoskeletal', x: 135, y: 384, side: 'left', label: 'Bones & muscle' },
+/**
+ * Each region's marker. `at` is a point on the 3D body in metres (x to the
+ * viewer's right, y up from the floor, z towards the viewer); radiation has no
+ * place on the body and sits beside it at a fixed spot.
+ */
+const SPOTS: { id: BodyRegionId; at?: Vec3; fixed?: { x: number; y: number }; side: 'left' | 'right'; label: string }[] = [
+  { id: 'head', at: [-0.02, 1.72, 0.09], side: 'left', label: 'Brain & sleep' },
+  { id: 'eyes', at: [0.035, 1.665, 0.1], side: 'right', label: 'Eyes' },
+  { id: 'wholeBody', fixed: { x: 262, y: 122 }, side: 'right', label: 'Radiation' },
+  { id: 'lungs', at: [-0.09, 1.34, 0.1], side: 'left', label: 'Air' },
+  { id: 'heart', at: [0.05, 1.27, 0.11], side: 'right', label: 'Heart' },
+  { id: 'gut', at: [-0.01, 1.05, 0.09], side: 'left', label: 'Nutrition' },
+  { id: 'skin', at: [0.32, 1.0, 0.03], side: 'right', label: 'Immune & skin' },
+  { id: 'musculoskeletal', at: [-0.1, 0.5, 0.06], side: 'left', label: 'Bones & muscle' },
 ]
+
+const VIEW: [number, number, number, number] = [-96, 28, 512, 456]
+const GLOW: Record<'ok' | 'watch' | 'alert', Vec3> = { ok: [0.2, 0.72, 0.55], watch: [0.95, 0.62, 0.12], alert: [0.9, 0.24, 0.27] }
+const spotXY = (spot: (typeof SPOTS)[number], yaw: number) => (spot.at ? project(spot.at, yaw) : spot.fixed!)
 
 function Source({ source }: { source: string }) {
   const match = source.match(/https?:\/\/[^\s]+/)
@@ -170,46 +180,83 @@ export function RegionPanel({ regionId, assessment, record }: { regionId: BodyRe
 
 function BodyMap({ assessment, selected, onSelect }: { assessment: Assessment; selected: BodyRegionId; onSelect: (id: BodyRegionId) => void }) {
   const halo = assessment.regions.wholeBody
+  const reducedMotion = useReducedMotion()
+  const [flat, setFlat] = useState(false) // true when WebGL is not available
+  const marks = useRef<(SVGGElement | null)[]>([])
+
+  // The body glows where something needs attention, and softly where you are looking.
+  const glows: Glow[] = SPOTS.filter((spot) => spot.at).map((spot) => {
+    const status = assessment.regions[spot.id]
+    const isSelected = selected === spot.id
+    return {
+      at: spot.at!,
+      color: GLOW[status === 'nodata' ? 'ok' : status],
+      strength: status === 'alert' ? (isSelected ? 0.9 : 0.7) : status === 'watch' ? (isSelected ? 0.8 : 0.5) : isSelected && status === 'ok' ? 0.45 : 0,
+    }
+  })
+
+  /** Keep the markers on the body as it turns. Written straight to the DOM: this runs every frame. */
+  function follow(yaw: number) {
+    SPOTS.forEach((spot, index) => {
+      const group = marks.current[index]
+      if (!group || !spot.at) return
+      const { x, y } = project(spot.at, yaw)
+      const labelX = spot.side === 'left' ? 28 : 292
+      group.querySelector('.leader')?.setAttribute('d', `M${x.toFixed(1)} ${y.toFixed(1)}L${labelX} ${project(spot.at, 0).y.toFixed(1)}`)
+      group.querySelectorAll('circle').forEach((circle) => {
+        circle.setAttribute('cx', x.toFixed(1))
+        circle.setAttribute('cy', y.toFixed(1))
+      })
+    })
+  }
+
   return (
-    <svg className="body-map" viewBox="-96 28 512 456" role="group" aria-label="Body map. Select a region to inspect its health signals.">
-      <ellipse className={`figure-halo ${STATUS[halo].className}`} cx="160" cy="256" rx="128" ry="222" />
-      <Figure />
-      {SPOTS.map((spot) => {
-        const status = assessment.regions[spot.id]
-        const labelX = spot.side === 'left' ? 28 : 292
-        const textX = spot.side === 'left' ? labelX - 8 : labelX + 8
-        return (
-          <g
-            key={spot.id}
-            role="button"
-            tabIndex={0}
-            aria-label={`${REGION_BY_ID[spot.id].label}: ${STATUS[status].label}`}
-            aria-pressed={selected === spot.id}
-            aria-controls="body-region-detail"
-            className={`hotspot ${STATUS[status].className} ${status === 'alert' ? 'is-alert' : ''} ${selected === spot.id ? 'is-selected' : ''}`}
-            onClick={() => onSelect(spot.id)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault()
-                onSelect(spot.id)
-              }
-            }}
-          >
-            <path className="leader" d={`M${spot.x} ${spot.y}H${labelX}`} />
-            <circle className="ring" cx={spot.x} cy={spot.y} r="13" />
-            <circle className="dot" cx={spot.x} cy={spot.y} r="6.5" />
-            <text x={textX} y={spot.y - 2} textAnchor={spot.side === 'left' ? 'end' : 'start'}>
-              {spot.label}
-            </text>
-            <text x={textX} y={spot.y + 10} textAnchor={spot.side === 'left' ? 'end' : 'start'} style={{ fill: 'var(--tone)' }}>
-              {STATUS[status].label}
-            </text>
-            {/* Generous invisible hit area covering marker and label. */}
-            <rect className="hit" x={spot.side === 'left' ? -92 : spot.x - 18} y={spot.y - 20} width={spot.side === 'left' ? spot.x + 110 : 412 - spot.x} height="40" />
-          </g>
-        )
-      })}
-    </svg>
+    <div className="body-figure">
+      {!flat && <Mannequin view={VIEW} glows={glows} animate={!reducedMotion} onFrame={follow} onUnsupported={() => setFlat(true)} />}
+      <svg className="body-map" viewBox={VIEW.join(' ')} role="group" aria-label="Body map. Select a region to inspect its health signals.">
+        <ellipse className={`figure-halo ${STATUS[halo].className}`} cx="160" cy="256" rx="128" ry="222" />
+        {flat && <Figure />}
+        {SPOTS.map((spot, index) => {
+          const status = assessment.regions[spot.id]
+          const { x, y } = spotXY(spot, 0)
+          const labelX = spot.side === 'left' ? 28 : 292
+          const textX = spot.side === 'left' ? labelX - 8 : labelX + 8
+          return (
+            <g
+              key={spot.id}
+              ref={(node) => {
+                marks.current[index] = node
+              }}
+              role="button"
+              tabIndex={0}
+              aria-label={`${REGION_BY_ID[spot.id].label}: ${STATUS[status].label}`}
+              aria-pressed={selected === spot.id}
+              aria-controls="body-region-detail"
+              className={`hotspot ${STATUS[status].className} ${status === 'alert' ? 'is-alert' : ''} ${selected === spot.id ? 'is-selected' : ''}`}
+              onClick={() => onSelect(spot.id)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault()
+                  onSelect(spot.id)
+                }
+              }}
+            >
+              <path className="leader" d={`M${x.toFixed(1)} ${y.toFixed(1)}L${labelX} ${y.toFixed(1)}`} />
+              <circle className="ring" cx={x.toFixed(1)} cy={y.toFixed(1)} r="13" />
+              <circle className="dot" cx={x.toFixed(1)} cy={y.toFixed(1)} r="6.5" />
+              <text x={textX} y={y - 2} textAnchor={spot.side === 'left' ? 'end' : 'start'}>
+                {spot.label}
+              </text>
+              <text x={textX} y={y + 10} textAnchor={spot.side === 'left' ? 'end' : 'start'} style={{ fill: 'var(--tone)' }}>
+                {STATUS[status].label}
+              </text>
+              {/* Generous invisible hit area covering marker and label. */}
+              <rect className="hit" x={spot.side === 'left' ? -92 : x - 18} y={y - 20} width={spot.side === 'left' ? x + 110 : 412 - x} height="40" />
+            </g>
+          )
+        })}
+      </svg>
+    </div>
   )
 }
 
