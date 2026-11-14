@@ -56,7 +56,7 @@ const a = assess(records, day, mission.env)       // everything for one person o
 
 ### `Insight`
 
-Use `describeInsight(i)` for the sentence. `i.good` says whether the effect is healthy; `i.strength` is `'moderate' | 'strong'`.
+Use `describeInsight(i)` for the sentence. `i.good` says whether the effect is healthy; `i.strength` is `'moderate' | 'strong'`. `i.p` is the p-value of the difference and `i.adjusted` is the difference that remains with all other behaviours accounted for (or `null`). Only pairs that pass the checks in `docs/VALIDATION.md` are returned.
 
 ## Other calls
 

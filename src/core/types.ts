@@ -157,6 +157,14 @@ export interface Insight {
   nWithout: number
   /** Cohen's d. */
   effect: number
+  /** Two-sided p-value of Welch's t-test for the difference. */
+  p: number
+  /**
+   * The difference that remains for this behaviour when all other logged
+   * behaviours are accounted for at the same time (multiple regression).
+   * Null when there was not enough data to separate them.
+   */
+  adjusted: number | null
   strength: 'moderate' | 'strong'
   /** True when the change goes in the healthy direction. */
   good: boolean

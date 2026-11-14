@@ -44,6 +44,7 @@ function InsightRow({ group }: { group: Insight[] }) {
         <p className="muted">
           {def.label} is {main.diff > 0 ? 'higher' : 'lower'} {sameDay ? 'on the same day' : 'the following night'}. Seen on {main.nWith} days with it,
           compared with {main.nWithout} without.
+          {main.adjusted != null && ` With your other logged behaviours accounted for: ${delta({ ...main, diff: main.adjusted })}.`}
         </p>
         {rest.length > 0 && (
           <ul className="insight-chips">
@@ -233,6 +234,15 @@ export default function Trends() {
         ) : (
           <p className="muted">At least 5 days with and 5 days without a behaviour are needed before a pattern is shown.</p>
         )}
+        <details className="method">
+          <summary>How a pattern earns its place here</summary>
+          <p className="muted">
+            Each behaviour is compared on the days you logged it and the days you did not. A pattern is shown only if the difference is at least moderate in size,
+            is unlikely to be chance after correcting for the roughly 70 comparisons made at once, and is still there when all your other behaviours are
+            accounted for together. On test data with no real effects about one person in ten is shown a false pattern; a strong real effect is found
+            nine times out of ten within 120 days. Weak effects are left out on purpose.
+          </p>
+        </details>
       </section>
     </div>
   )

@@ -6,7 +6,7 @@ Health monitoring tool for astronauts on long-duration missions: daily journal +
 
 - **Daily picture of your health.** 15 indicators (sleep, heart, blood pressure, temperature, glucose, body mass, exercise, radiation, cabin CO₂, mood…) are colour-coded against clinical reference ranges **and against your own baseline**.
 - **Tells you what to do and who to involve.** Findings come with concrete steps and one of three levels: self-care, Crew Medical Officer, flight surgeon on the ground. With a Mars-distance link the tool tells you to start now instead of waiting for a reply.
-- **Finds what affects your recovery.** A correlation engine compares the days you logged a behaviour (late caffeine, shifted schedule, contact with home…) with the days you did not.
+- **Finds what affects your recovery.** A correlation engine compares the days you logged a behaviour (late caffeine, shifted schedule, contact with home…) with the days you did not, corrects for the number of comparisons and for behaviours that come in bundles, and was tested on data with known truth ([docs/VALIDATION.md](docs/VALIDATION.md)).
 - **Looks ahead.** A mission outlook projects cumulative radiation, bone density at risk, sleep debt and body mass to the end of the mission.
 - **Writes the message to the ground.** One complete SBAR report for the flight surgeon, because with a delayed link every follow-up question costs a full round trip.
 - **Guides the measurement.** Blood pressure is taken with on-screen steps and timers.
@@ -34,6 +34,7 @@ Other commands: `npm test` (logic tests), `npm run typecheck`, `npm run build`.
 | `docs/CORE_API.md` | How the UI calls the logic | |
 | `docs/TASKS.md` | Task board and briefs | |
 | `docs/SOURCES.md` | References, licences and how AI tools were used | |
+| `docs/VALIDATION.md` | How the correlation engine was tested, with results | |
 | `docs/SUBMISSION.md` | Draft text for the project page and the demo script | |
 
 ## Disclaimer

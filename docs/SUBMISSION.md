@@ -30,11 +30,12 @@ On the International Space Station a flight surgeon is a few seconds away. On th
 
 ### How it works
 
-All health logic is deterministic TypeScript with tests (52). Nothing is computed by an AI model, so every number and recommendation can be traced to a rule and a cited threshold.
+All health logic is deterministic TypeScript with tests (56). Nothing is computed by an AI model, so every number and recommendation can be traced to a rule and a cited threshold.
 
 - A value is judged twice: against clinical reference ranges, and against the person's own 28-day baseline using a robust z-score. One unusual day is a prompt to look; sustained patterns are escalated.
 - "Not measured" is never shown as "fine". Missing data has its own state throughout.
-- The correlation engine compares days with and without each logged behaviour, requires at least five days in each group, and reports only moderate or strong effects (Cohen's d ≥ 0.5), because testing many pairs at once produces weak effects by chance.
+- The correlation engine compares days with and without each logged behaviour. A pattern is shown only if it is at least moderate in size (Cohen's d ≥ 0.5), survives a correction for the roughly 70 comparisons made at once (Welch's t-test with Benjamini–Hochberg), and is still there in a multiple regression with all other behaviours accounted for.
+- The engine was tested on generated data with known truth (`docs/VALIDATION.md`). The first version showed 3.1 false patterns per astronaut on data with no effects; the current one shows 0.13, and still finds a strong real effect 93% of the time within 120 days.
 - Entries are stored on the device. There is no backend.
 
 ### Data
