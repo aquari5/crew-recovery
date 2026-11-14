@@ -88,3 +88,26 @@ export function assess(records: DailyRecord[], day: number, env: MissionEnvironm
 export function topLevel(findings: Finding[]): 0 | EscalationLevel {
   return findings.reduce<0 | EscalationLevel>((m, f) => (f.level > m ? f.level : m), 0)
 }
+
+export interface TimelineDay {
+  day: number
+  status: Status
+  /** Highest escalation level that day, 0 when there is nothing to act on. */
+  level: 0 | EscalationLevel
+}
+
+/**
+ * Status of every mission day, for the timeline strip. Cheaper than calling
+ * `assess` per day: it skips insights, tasks and points.
+ */
+export function missionTimeline(records: DailyRecord[], env: MissionEnvironment): TimelineDay[] {
+  return records.map((r) => {
+    const hist = upTo(records, r.day)
+    const findings = findFindings(hist, r.day, env)
+    const status = worst(
+      ...evaluateAll(hist, r.day).map((i) => i.status),
+      ...findings.map((f) => LEVEL_STATUS[f.level]),
+    )
+    return { day: r.day, status, level: topLevel(findings) }
+  })
+}

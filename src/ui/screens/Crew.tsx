@@ -2,7 +2,6 @@ import { useMemo } from 'react'
 import { useMission } from '../state'
 import { StatusBadge } from '../status'
 import { crewAssessments } from '../crew'
-import './Remaining.css'
 const LEVEL = { 1: 'Self-care', 2: 'Crew Medical Officer', 3: 'Flight surgeon' } as const
 export default function Crew({ onOpenToday }: { onOpenToday: () => void }) {
   const { mission, day, setCrewId, revision } = useMission()

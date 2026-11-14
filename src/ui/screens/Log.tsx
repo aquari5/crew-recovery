@@ -3,7 +3,6 @@ import { assess, clearEntries, INDICATOR_BY_ID, JOURNAL, saveEntry, SYMPTOMS, wi
 import { useMission } from '../state'
 import { StatusBadge } from '../status'
 import { averageReadings, initialMeasurements, MEASUREMENTS, measurementPatch, validateMeasurements, type MeasurementDraft, type MeasurementKey } from '../log'
-import './Remaining.css'
 
 const SCALES = ['mood', 'energy', 'stress'] as const
 const DRAFT_PREFIX = 'crew-recovery:ui-draft:'
