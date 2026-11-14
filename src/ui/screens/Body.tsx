@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react'
 import {
+  CREW_REFERENCE,
+  IN_FLIGHT,
   INDICATOR_BY_ID,
   REGION_BY_ID,
   SYMPTOMS,
@@ -75,6 +77,8 @@ function Source({ source }: { source: string }) {
 
 function IndicatorCard({ result, day }: { result: IndicatorResult; day: number }) {
   const definition = INDICATOR_BY_ID[result.id]
+  const reference = CREW_REFERENCE[result.id]
+  const inFlight = IN_FLIGHT[result.id]
   return (
     <article className="body-indicator">
       <div className="body-indicator-heading">
@@ -91,6 +95,15 @@ function IndicatorCard({ result, day }: { result: IndicatorResult; day: number }
           <li key={reason}>{reason}</li>
         ))}
       </ul>
+      {reference && (
+        <p className="flight-ref">
+          <span className="eyebrow">Measured in real crews</span>
+          {reference.text}{' '}
+          <a href={reference.url} target="_blank" rel="noopener noreferrer">
+            {reference.source} ↗
+          </a>
+        </p>
+      )}
       <details>
         <summary>How to measure</summary>
         <ol>
@@ -98,6 +111,14 @@ function IndicatorCard({ result, day }: { result: IndicatorResult; day: number }
             <li key={step}>{step}</li>
           ))}
         </ol>
+        {inFlight && (
+          <p className="flight-note">
+            <strong>Flown today.</strong> {inFlight.text}{' '}
+            <a href={inFlight.url} target="_blank" rel="noopener noreferrer">
+              {inFlight.source} ↗
+            </a>
+          </p>
+        )}
       </details>
       <details>
         <summary>Why it matters in space</summary>

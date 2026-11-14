@@ -273,6 +273,10 @@ p { line-height: 1.55; }
 
 /* ── Sheets (dialogs) ───────────────────────────────────────────────────── */
 .sheet { width: min(760px, calc(100% - 24px)); max-height: min(86dvh, 900px); margin: auto; padding: 0; border: 0; border-radius: 24px; background: var(--surface); color: var(--ink); box-shadow: 0 30px 80px -20px rgba(10, 16, 32, 0.45); overflow: auto; }
+.flight-ref { margin-top: 12px; padding: 10px 12px; border-radius: 12px; background: var(--bg); font-size: 0.875rem; line-height: 1.5; color: var(--ink-2); }
+.flight-ref .eyebrow { display: block; margin-bottom: 2px; }
+.flight-ref a, .flight-note a { color: var(--accent); white-space: nowrap; }
+.flight-note { margin-top: 10px; font-size: 0.875rem !important; }
 .guide { width: min(820px, calc(100% - 24px)); }
 .guide-video { display: block; width: 100%; aspect-ratio: 16 / 9; margin-top: 18px; border-radius: 16px; background: #04070e; }
 .guide-steps { display: grid; gap: 12px; margin-top: 20px; counter-reset: step; }
@@ -514,7 +518,8 @@ details ul { display: grid; gap: 6px; font-size: 0.8125rem !important; }
   .story { grid-template-columns: minmax(0, 1fr); }
   .app { padding-bottom: calc(170px + env(safe-area-inset-bottom)); }
   .log-actions { bottom: calc(150px + env(safe-area-inset-bottom)); border-radius: 20px; }
-  .nav-meta .pill-select:first-child { display: none; }
+  .nav-meta { flex-wrap: wrap; justify-content: flex-end; }
+  .nav-meta .pill-select select { max-width: 9.5rem; }
   .region-chips { display: flex; }
   .body-legend { display: none; }
   .hotspot text, .hotspot .leader { display: none; }

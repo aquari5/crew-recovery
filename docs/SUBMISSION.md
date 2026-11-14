@@ -1,16 +1,16 @@
 # Submission draft
 
-Text for the NASA Space Apps project page. Check the field names and length limits against the Project Submission Guide before pasting.
+Text for the NASA Space Apps project page. The headings below are the fields of the 2026 project form, in order.
 
-## Project name
+## Project Name
 
 Crew Recovery
 
-## High-level summary
+## High-Level Project Summary
 
 Crew Recovery is a health monitoring tool for astronauts who are too far from Earth to ask a doctor in real time. It turns a daily two-minute check-in and wearable data into one clear answer: am I fit for today, what should I do about it, and who needs to know. Fifteen health indicators are colour-coded against clinical reference ranges and against the astronaut's own baseline. Sixteen rules turn patterns into step-by-step actions at three levels: handle it yourself, involve the Crew Medical Officer, or contact the flight surgeon. A correlation engine shows each astronaut which of their own habits help or hurt their recovery. A mission outlook projects the slow risks — radiation dose, bone loss, sleep debt, body mass — to the end of the mission. When the ground must be involved, the tool writes one complete medical report, because with a 20-minute delay every follow-up question costs 40 minutes. Everything runs in the browser with no server and no network.
 
-## Project details
+## Detailed Project Description
 
 ### The problem
 
@@ -19,7 +19,7 @@ On the International Space Station a flight surgeon is a few seconds away. On th
 ### What it does
 
 - **Today.** One headline and one colour for the day, a readiness score from sleep, heart rate variability, resting heart rate and self-ratings, and a short list of what to do, each with ordered steps and the right level of escalation.
-- **Body.** A figure with eight regions. Each shows its indicators, what they mean, how to take the measurement, why it matters in space, and the source of the threshold.
+- **Body.** A 3D figure with eight regions that glows where something needs attention. Each region shows its indicators, how to take the measurement, which flight hardware measures it today, what was measured in real crews, why it matters in space, and the source of the threshold.
 - **Trends.** Every indicator over time, with the reference zones and the astronaut's own normal drawn on the chart, and the behaviours that go together with better or worse recovery in that person's own data.
 - **Log.** A daily check-in: mood, energy and stress, twelve yes/no journal items, symptoms, and measurements. Blood pressure has a guided mode with timers, because a correct reading needs five minutes of rest and two readings.
 - **Crew.** An overview for the Crew Medical Officer, most urgent person first.
@@ -53,13 +53,34 @@ The demo uses a synthetic 120-day Mars transit for a crew of four, generated fro
 
 It is a prototype for demonstration and education, not a medical device. Thresholds are screening values. The bone estimate assumes a resistive session fully protects bone that day. Radiation projection is linear and cannot foresee solar events. The synthetic data was written to demonstrate the logic and does not validate it.
 
-## Space agency data and resources
+## NASA Data
 
-See `docs/SOURCES.md` for the full list: NASA Human Research Program hazards, risks and research pages; NASA-STD-3001; NASA OCHMO technical briefs on carbon dioxide and radiation protection; Canadian Space Agency resources on radiation monitoring.
+NASA data and resources are the basis of the tool's rules, not an addition to them:
 
-## Use of Super Intelligence (SI) tools
+- **NASA Human Research Program, 5 Hazards of Human Spaceflight** and the HRP risk pages (sleep, cardiovascular, bone, behavioural, immune, nutrition, SANS, distance from Earth, radiation): they define which indicators are tracked, how body regions and hazards are grouped, and the content of the escalation rules.
+- **NASA-STD-3001** (Vol. 1 and 2) and the **NASA OCHMO technical briefs** on carbon dioxide and radiation protection: the 600 mSv career dose limit and the cabin CO₂ limits (3 mmHg 1-hour average, 2.5 mmHg 7-day average) are the thresholds the app uses.
+- **Mars Science Laboratory RAD measurements** (Zeitlin et al., Science 2013): the 1.8 mSv/day deep-space dose rate drives the radiation model and the end-of-mission projection.
+- **NASA-funded ISS sleep study** (Barger et al., Lancet Neurology 2014): the 6.09 h crew average is shown next to the user's own sleep.
+- **ISS body mass measurements with SLAMMD** (Zwart et al. 2014): the measured crew mass loss is shown next to the user's own trend, and the −5% / −10% rules follow it.
+- **NASA, Wearable Tech for Space Station Research**: confirms that sleep, CO₂ exposure and radiation are measured with crew-worn devices today; each indicator in the app names its flight hardware.
+- **NASA HRP bone loss rate** (1–1.5% per month without countermeasures): used in the bone outlook.
 
-See "Use of AI tools" in `docs/SOURCES.md`. Claude (Anthropic) and Codex (OpenAI) were used as coding assistants during the hackathon. The application itself does not call any AI model.
+Full list with links: `docs/SOURCES.md`.
+
+## Space Agency Partner Data and Other References
+
+- **Canadian Space Agency:** Bio-Monitor (continuous heart rate, blood pressure, blood oxygen, skin temperature on the ISS), "Monitoring radiation for astronaut health", EVARM personal dosimeters.
+- **European Space Agency:** T-Mini core temperature sensor and Active Dosimeter, as described in NASA's wearable technology article.
+- Clinical reference ranges: 2025 AHA/ACC blood pressure guideline, ADA Standards of Care, AASM/SRS sleep consensus.
+- Statistics: Welch 1947, Benjamini and Hochberg 1995, Cohen 1988.
+- Software: React, Vite, TypeScript, Tailwind CSS, Recharts, Vitest (MIT); Geist typefaces (SIL OFL 1.1).
+- No third-party images, 3D models, music or datasets are used. The demo data is synthetic and generated by the project's own code.
+
+Full list with links and licences: `docs/SOURCES.md`.
+
+## Use of Super Intelligence (SI)
+
+Yes. Claude (Anthropic), through Claude Code, was used as a coding assistant during the hackathon to write the health logic, its tests, the user interface, the shader that draws the 3D body figure, the documentation, and the script that records the demo video from the running application. Codex (OpenAI) was used to write the first version of the user interface. The team chose the challenge, set the direction, made the design and scope decisions and reviewed the results. The application itself does not call any AI model: every number and recommendation is computed by deterministic, tested code. No images, audio or video were produced by a generative model. Details: "Use of AI tools" in `docs/SOURCES.md`.
 
 ## Links for the form
 
