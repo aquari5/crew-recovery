@@ -8,7 +8,7 @@ export default defineConfig({
   base: './',
   plugins: [react(), tailwindcss()],
   test: {
-    include: ['src/**/*.test.ts'],
+    include: ['src/**/*.test.{ts,tsx}'],
     // macOS writes '._*' sidecar files on exFAT/FAT drives; they are not tests.
     exclude: ['**/._*', '**/node_modules/**'],
   },

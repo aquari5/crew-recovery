@@ -4,12 +4,14 @@
 // keeps working with no link to Earth. Entries are stored as patches on top of
 // the mission records and merged at read time.
 
-import type { DailyRecord } from './types'
+import type { DailyRecord, IndicatorId } from './types'
 
 const KEY = 'crew-recovery:entries:v1'
 
-/** A partial update for one crew member's day. */
-export type EntryPatch = Partial<Pick<DailyRecord, 'values' | 'journal' | 'symptoms' | 'note'>>
+/** A partial update for one crew member's day. A `null` value clears that reading. */
+export type EntryPatch = Partial<Pick<DailyRecord, 'journal' | 'symptoms' | 'note'>> & {
+  values?: Partial<Record<IndicatorId, number | null>>
+}
 
 type Store = Record<string, Record<number, EntryPatch>>
 
@@ -32,9 +34,10 @@ function write(store: Store): void {
 /** Merge a patch into a record. `values` and `journal` merge per key; a null value clears a reading. */
 export function applyPatch(record: DailyRecord, patch: EntryPatch | undefined): DailyRecord {
   if (!patch) return record
-  const values = { ...record.values, ...patch.values }
-  for (const k of Object.keys(values) as (keyof typeof values)[]) {
-    if (values[k] == null) delete values[k]
+  const values: DailyRecord['values'] = { ...record.values }
+  for (const [k, v] of Object.entries(patch.values ?? {}) as [IndicatorId, number | null | undefined][]) {
+    if (v == null) delete values[k]
+    else values[k] = v
   }
   return {
     ...record,

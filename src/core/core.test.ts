@@ -207,7 +207,7 @@ describe('storage patches', () => {
   it('merges values per key and clears a reading with null', () => {
     const rec = days(1, () => ({ values: { temp: 36.6, mood: 4 }, journal: { evaDay: false } }))[0]
     const out = applyPatch(rec, {
-      values: { temp: 37.9, mood: null as unknown as number },
+      values: { temp: 37.9, mood: null },
       journal: { caffeineLate: true },
     })
     expect(out.values).toEqual({ temp: 37.9 })

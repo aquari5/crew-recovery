@@ -164,6 +164,26 @@ show the radiation event.
 - Empty and `nodata` states on every screen; keyboard navigation; reduced-motion support.
 - App icon and page title in `public/`.
 
+### U8 — Follow-ups from review of U1–U7 (14 Nov)
+
+U1–U7 are merged and working. Remaining UI items, most important first:
+
+```
+Only edit files in src/ui/, src/App.tsx and src/index.css.
+
+1. First screen: on a 1280x720 laptop the header, mission controls, hero title, "Mission story"
+   button and summary strip fill the whole screen, so the tabs and the readiness ring are below
+   the fold. Make the top area compact (smaller title, controls and summary in one band) so that
+   the tabs and the top of the Today screen are visible without scrolling at 1280x720.
+2. Trends: the watch and alert threshold zones both render as grey. Make them clearly amber and
+   red (same hues as the status badges) and add a small text label inside each zone.
+3. Fix the 5 oxlint warnings (npm run lint): move STORY, formatDate and useMission to files that
+   export no components, and drop the unnecessary `revision` dependency by depending on a value
+   that actually changes (for example pass revision into the memoised function).
+
+Done when: npm run typecheck, npm test and npm run lint are clean.
+```
+
 ## Logic tasks (`aquari5` + Claude)
 
 - [x] Data model, indicator catalogue, thresholds with sources
@@ -174,7 +194,7 @@ show the radiation event.
 - [x] Check-in tasks, streak, points
 - [x] Synthetic 120-day mission for four crew members
 - [x] Local storage of entries
-- [x] Tests (27)
+- [x] Tests (27 logic + 20 UI, all run by `npm test`)
 - [x] Verify thresholds against sources (see `docs/SOURCES.md` for what was checked)
 - [x] Environment option (station / Moon / Mars) affecting radiation and delay notes
 - [ ] Demo script and 30-second video plan
