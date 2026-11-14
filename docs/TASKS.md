@@ -30,12 +30,13 @@ The first UI (tasks U1–U7) was built by `afkjacobbb` with Codex. On 14 Novembe
 - [x] Check-in tasks, streak, points
 - [x] Synthetic 120-day mission for four crew members
 - [x] Local storage of entries
-- [x] Tests (27 logic + 20 UI, all run by `npm test`)
+- [x] Tests (32 logic + 20 UI, all run by `npm test`)
 - [x] UI redesign
 - [x] Verify thresholds against sources (see `docs/SOURCES.md` for what was checked)
 - [x] Environment option (station / Moon / Mars) affecting radiation and delay notes
-- [ ] Demo script and 30-second video plan
-- [ ] Submission text, including the required description of AI tool use
+- [x] Mission outlook, ground report, guided blood pressure measurement, five-hazards view
+- [x] Demo script and submission text draft (`docs/SUBMISSION.md`)
+- [ ] Record the 30-second demo video
 - [ ] Deploy the build to a public URL
 
 ## Requests (UI → logic)

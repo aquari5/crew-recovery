@@ -257,6 +257,45 @@ p { line-height: 1.55; }
 .stat-big small { font-size: 0.875rem; letter-spacing: 0; color: var(--muted); margin-left: 6px; font-weight: 400; }
 .insight-quote { font-size: 1.0625rem; line-height: 1.45; letter-spacing: -0.015em; text-wrap: pretty; }
 
+/* ── Outlook and hazards ────────────────────────────────────────────────── */
+.outlook-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.outlook { display: flex; flex-direction: column; gap: 10px; }
+.outlook-value { font-size: clamp(1.9rem, 2.6vw, 2.5rem); font-weight: 500; letter-spacing: -0.05em; line-height: 1; font-variant-numeric: tabular-nums; color: var(--tone); white-space: nowrap; }
+.outlook .muted { font-size: 0.875rem; }
+.outlook details { margin-top: auto; padding-top: 6px; }
+.hazard-row { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-top: 1px solid var(--line); }
+.hazard { display: flex; flex-direction: column; gap: 8px; padding: 20px 18px 4px 0; }
+.hazard + .hazard { padding-left: 18px; border-left: 1px solid var(--line); }
+.hazard h3 { font-size: 1.0625rem; }
+.hazard .muted { font-size: 0.8125rem; line-height: 1.45; }
+.hazard-state { margin-top: auto; padding-top: 10px; display: inline-flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 0.6875rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--tone); }
+.hazard-state i { width: 8px; height: 8px; border-radius: 50%; background: var(--tone); }
+
+/* ── Sheets (dialogs) ───────────────────────────────────────────────────── */
+.sheet { width: min(760px, calc(100% - 24px)); max-height: min(86dvh, 900px); margin: auto; padding: 0; border: 0; border-radius: 24px; background: var(--surface); color: var(--ink); box-shadow: 0 30px 80px -20px rgba(10, 16, 32, 0.45); overflow: auto; }
+.sheet-narrow { width: min(460px, calc(100% - 24px)); }
+.sheet::backdrop { background: rgba(10, 16, 32, 0.38); backdrop-filter: blur(6px); }
+/* Modals stay centred: they are not anchored to a trigger. */
+.sheet[open] { animation: sheet-in 240ms var(--ease-out) both; }
+.sheet[open]::backdrop { animation: fade-in 240ms ease both; }
+@keyframes sheet-in { from { opacity: 0; transform: translateY(12px) scale(0.98); } }
+@keyframes fade-in { from { opacity: 0; } }
+.sheet-body { padding: clamp(20px, 3vw, 32px); }
+.sheet-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+.report { margin-top: 18px; padding: 18px; border-radius: 16px; background: var(--bg); border: 1px solid var(--line); font-family: var(--mono); font-size: 0.75rem; line-height: 1.6; white-space: pre-wrap; overflow-x: auto; max-height: 46dvh; user-select: text; }
+.steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 16px 0 20px; }
+.steps i { height: 3px; border-radius: 3px; background: var(--line-strong); transition: background-color 200ms ease; }
+.steps i[data-done='true'] { background: var(--ink); }
+.steps i[data-now='true'] { background: var(--accent); }
+.countdown { margin-top: 18px; font-size: clamp(4rem, 14vw, 6rem); font-weight: 500; letter-spacing: -0.06em; line-height: 1; }
+.bp-inputs { display: flex; align-items: flex-end; gap: 12px; margin-top: 20px; font-size: 2rem; color: var(--faint); }
+.bp-inputs label { display: grid; gap: 6px; }
+.bp-inputs input { width: 112px; min-height: 64px; padding: 0 14px; border-radius: 14px; border: 1px solid var(--line-strong); background: var(--surface); font-size: 2rem; font-weight: 500; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; color: var(--ink); }
+.bp-inputs input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+.bp-inputs .eyebrow:last-child { padding-bottom: 22px; }
+.guided-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.guided-row p { max-width: 52ch; }
+
 /* ── Timeline dock ──────────────────────────────────────────────────────── */
 .dock { position: fixed; z-index: 40; left: 50%; bottom: calc(14px + env(safe-area-inset-bottom)); width: min(1160px, calc(100% - 24px)); transform: translateX(-50%); display: grid; gap: 8px; }
 .dock-bar {
@@ -444,6 +483,9 @@ details ul { display: grid; gap: 6px; font-size: 0.8125rem !important; }
   .tabs { grid-column: 1 / -1; grid-row: 2; justify-self: start; margin-top: 10px; max-width: 100%; overflow-x: auto; scrollbar-width: none; }
   .brand-sub { display: none; }
   .today-grid, .body-layout, .trends-layout { grid-template-columns: minmax(0, 1fr); }
+  .outlook-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hazard-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hazard, .hazard + .hazard { padding: 18px 16px 14px 0; border-left: 0; border-bottom: 1px solid var(--line); }
   .body-stage { position: static; }
   .metric-list { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
 }
@@ -454,7 +496,7 @@ details ul { display: grid; gap: 6px; font-size: 0.8125rem !important; }
   .action-card { grid-template-columns: minmax(0, 1fr); }
   .action-level { grid-auto-flow: column; justify-content: start; align-items: baseline; gap: 12px; }
   .action-level b { font-size: 1.5rem; }
-  .scale-grid, .journal-grid, .measurement-grid, .crew-grid { grid-template-columns: minmax(0, 1fr); }
+  .scale-grid, .journal-grid, .measurement-grid, .crew-grid, .outlook-grid, .hazard-row { grid-template-columns: minmax(0, 1fr); }
   .insight { grid-template-columns: minmax(0, 1fr); gap: 8px; }
   .dock-bar { grid-template-columns: 1fr auto; padding: 10px 12px; border-radius: 20px; }
   .strip { grid-column: 1 / -1; grid-row: 2; height: 30px; }
@@ -473,7 +515,7 @@ details ul { display: grid; gap: 6px; font-size: 0.8125rem !important; }
 
 @media (prefers-reduced-motion: reduce) {
   .orb-core, .hotspot.is-alert .ring { animation: none; }
-  .screen, .stagger > *, .story { animation: fade-only 200ms ease both; }
+  .screen, .stagger > *, .story, .sheet[open] { animation: fade-only 200ms ease both; }
   @keyframes fade-only { from { opacity: 0; } }
   .signal-bar > span, .meter > span { transition: none; }
 }

@@ -58,6 +58,14 @@ const a = assess(records, day, mission.env)       // everything for one person o
 
 Use `describeInsight(i)` for the sentence. `i.good` says whether the effect is healthy; `i.strength` is `'moderate' | 'strong'`.
 
+## Other calls
+
+| Call | Returns |
+|---|---|
+| `missionTimeline(records, env)` | `{ day, status, level }[]` for every mission day; `status` equals `assess(...).overall` for that day |
+| `missionOutlook(records, day, mission.plannedDays)` | Four `OutlookItem`s (`radiation`, `bone`, `sleepDebt`, `bodyMass`) with `value`, `detail`, `status`, `basis` |
+| `buildGroundReport({ crew, missionName, env, records, assessment })` | `{ subject, body }`, a plain-text SBAR report |
+
 ## Static content (for labels, help text, the body map)
 
 | Export | Use |

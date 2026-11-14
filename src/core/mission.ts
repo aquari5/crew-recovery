@@ -26,6 +26,8 @@ export interface MissionData {
   env: MissionEnvironment
   startDate: string
   days: number
+  /** Planned length of this mission phase in days; used for projections. */
+  plannedDays: number
   crew: CrewMember[]
   /** Records per crew member id, sorted by day. */
   records: Record<string, DailyRecord[]>
@@ -221,6 +223,9 @@ const MISSION_NAME: Record<MissionEnvironment['id'], string> = {
   marsSurface: 'Mars surface stay',
 }
 
+/** Planned length of each mission phase, in days. */
+const PLANNED_DAYS: Record<MissionEnvironment['id'], number> = { leo: 180, lunar: 180, marsTransit: 210, marsSurface: 500 }
+
 export interface MissionOptions {
   seed?: number
   days?: number
@@ -241,6 +246,7 @@ export function generateMission(options: MissionOptions = {}): MissionData {
     env,
     startDate,
     days,
+    plannedDays: Math.max(days, PLANNED_DAYS[envId]),
     crew: PROFILES.map(({ id, name, role }) => ({ id, name, role })),
     records,
   }

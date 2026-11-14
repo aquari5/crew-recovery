@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { assess, clearEntries, INDICATOR_BY_ID, JOURNAL, saveEntry, SYMPTOMS, withEntries, type DailyRecord, type IndicatorId, type IndicatorResult, type JournalKey, type SymptomKey } from '../../core'
 import { useMission } from '../state'
+import GuidedBP from '../GuidedBP'
 import { StatusBadge } from '../status'
 import { averageReadings, initialMeasurements, MEASUREMENTS, measurementPatch, validateMeasurements, type MeasurementDraft, type MeasurementKey } from '../log'
 
@@ -49,6 +50,7 @@ function LogForm({ onOpenToday }: { onOpenToday: () => void }) {
   const [saveError, setSaveError] = useState('')
   const [changed, setChanged] = useState<IndicatorResult[]>([])
   const [resetConfirm, setResetConfirm] = useState(false)
+  const [guided, setGuided] = useState(false)
   const errorRef = useRef<HTMLDivElement>(null)
   const dirty = !!(draft.touched.length || draft.scaleTouched.length || draft.journalTouched.length || draft.symptomsTouched)
   useEffect(() => {
@@ -105,7 +107,8 @@ function LogForm({ onOpenToday }: { onOpenToday: () => void }) {
     <section className="workspace-panel"><div className="panel-heading"><h3>Daily journal</h3><span className="muted">Select what happened today.</span></div><div className="journal-grid">{JOURNAL.map(item => <button type="button" key={item.key} className="journal-toggle" aria-pressed={draft.journal[item.key] === true} onClick={() => { setDraft(old => ({ ...old, journal: { ...old.journal, [item.key]: !old.journal[item.key] }, journalTouched: [...new Set([...old.journalTouched, item.key])] })); setMessage(''); setChanged([]) }}><span aria-hidden="true">{draft.journal[item.key] ? '✓' : '○'}</span><span><strong>{item.label}</strong><small>{item.hint}</small></span></button>)}</div></section>
     <section className="workspace-panel"><div className="panel-heading"><h3>Symptoms</h3><span className="muted">Select all that apply.</span></div><div className="symptom-options">{SYMPTOMS.map(item => <button className="button" type="button" key={item.key} aria-pressed={draft.symptoms.includes(item.key)} onClick={() => { setDraft(old => ({ ...old, symptoms: old.symptoms.includes(item.key) ? old.symptoms.filter(key => key !== item.key) : [...old.symptoms, item.key], symptomsTouched: true })); setMessage(''); setChanged([]) }}><span aria-hidden="true">{draft.symptoms.includes(item.key) ? '✓' : '+'}</span>{item.label}</button>)}</div><p className="log-note muted">{draft.symptoms.length ? `${draft.symptoms.length} selected` : 'No symptoms selected.'}</p></section>
     <section className="workspace-panel"><div className="panel-heading"><h3>Measurements</h3><span className="muted">Clear a field to remove its reading.</span></div>
-      <p className="log-note muted">Blood pressure: take two readings and enter both. Previously saved averages are shown in both fields until you replace them.</p>
+      <div className="log-note guided-row"><p className="muted">Blood pressure needs two readings after five minutes of rest. Previously saved averages are shown in both fields until you replace them.</p><button type="button" className="button" onClick={() => setGuided(true)}>Guide me through it <span aria-hidden="true">→</span></button></div>
+      <GuidedBP open={guided} onClose={() => setGuided(false)} onDone={(first, second) => { editMeasurement('sys1', first.sys); editMeasurement('dia1', first.dia); editMeasurement('sys2', second.sys); editMeasurement('dia2', second.dia) }} />
       <div className="measurement-grid">{MEASUREMENTS.map(field => <div className="measurement-field" key={field.key}><label htmlFor={`measurement-${field.key}`}>{field.label} <span className="muted">({INDICATOR_BY_ID[field.id].unit})</span></label><div className="measurement-markers">{due(field.id)}{INDICATOR_BY_ID[field.id].cadence === 'weekly' && <span className="eyebrow">Weekly</span>}</div><input id={`measurement-${field.key}`} type="number" inputMode="decimal" min={field.min} max={field.max} step={field.step} value={draft.measurements[field.key]} onChange={event => editMeasurement(field.key, event.target.value)} aria-invalid={!!errors[field.key]} aria-describedby={errors[field.key] ? `error-${field.key}` : undefined} />{errors[field.key] && <p className="field-error" id={`error-${field.key}`}>{errors[field.key]}</p>}<MeasurementHelp id={field.id} /></div>)}</div>
       <p className="bp-average">Blood pressure average: <strong>{averageReadings(draft.measurements.sys1, draft.measurements.sys2) ?? '—'} / {averageReadings(draft.measurements.dia1, draft.measurements.dia2) ?? '—'} mmHg</strong></p>
     </section>

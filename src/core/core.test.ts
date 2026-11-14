@@ -7,7 +7,10 @@ import {
   evaluateIndicator,
   findFindings,
   findInsights,
+  buildGroundReport,
   generateMission,
+  missionOutlook,
+  missionTimeline,
   streak,
   tasksFor,
   topLevel,
@@ -203,6 +206,27 @@ describe('tasks and streak', () => {
   })
 })
 
+describe('missionOutlook', () => {
+  it('projects radiation linearly and grades it against the career limit', () => {
+    const recs = days(100, () => ({ values: { radiation: 2 } }))
+    const item = missionOutlook(recs, 100, 300).find((i) => i.id === 'radiation')!
+    expect(item.value).toBe('600 mSv') // 200 so far + 2 x 200 days left
+    expect(item.status).toBe('alert')
+    expect(missionOutlook(recs, 100, 100)[0].status).toBe('ok') // 200 of 600
+  })
+  it('counts only logged days without resistive exercise for bone risk', () => {
+    const recs = days(60, (d) => ({ journal: d <= 30 ? { resistiveExercise: false } : d <= 50 ? { resistiveExercise: true } : {} }))
+    const item = missionOutlook(recs, 60, 200).find((i) => i.id === 'bone')!
+    expect(item.value).toBe('−1.0 to −1.5%') // 30 unloaded days = one month
+    expect(item.detail).toContain('30 of 50 logged days')
+    expect(item.status).toBe('watch')
+  })
+  it('says nodata instead of projecting from too little', () => {
+    const items = missionOutlook(days(3, () => ({})), 3, 200)
+    expect(items.every((i) => i.status === 'nodata' && i.value === '—')).toBe(true)
+  })
+})
+
 describe('storage patches', () => {
   it('merges values per key and clears a reading with null', () => {
     const rec = days(1, () => ({ values: { temp: 36.6, mood: 4 }, journal: { evaDay: false } }))[0]
@@ -253,6 +277,25 @@ describe('demo mission', () => {
     // Inside Earth's magnetic field the same solar event is a smaller dose and no shelter order.
     expect(leo.a.findings.find((f) => f.id === 'radiation-event')?.level ?? 0).toBeLessThan(3)
     expect(leo.env.commDelaySec).toBeLessThan(1)
+  })
+
+  it('gives the timeline the same status as the full assessment', () => {
+    const line = missionTimeline(me, m.env)
+    for (const day of [30, 44, 47, 64, 78, 92, 110, 120]) {
+      expect(line[day - 1].status).toBe(assess(me, day, m.env).overall)
+    }
+  })
+
+  it('writes a ground report that leads with the most urgent finding', () => {
+    const a = assess(me, 78, m.env)
+    const report = buildGroundReport({ crew: m.crew[0], missionName: m.name, env: m.env, records: me, assessment: a })
+    expect(report.subject).toContain('L3')
+    expect(report.body).toContain('SITUATION')
+    expect(report.body).toContain('Radiation storm')
+    expect(report.body).toContain('Flight surgeon review requested')
+    expect(report.body).toContain('20 min round trip')
+    const calm = buildGroundReport({ crew: m.crew[0], missionName: m.name, env: m.env, records: me, assessment: assess(me, 30, m.env) })
+    expect(calm.body).toContain('No reply required')
   })
 
   it('lets the correlation engine recover the built-in effects', () => {

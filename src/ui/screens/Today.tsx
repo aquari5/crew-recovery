@@ -1,8 +1,9 @@
-import { useState } from 'react'
-import { INDICATOR_BY_ID, describeInsight, topLevel, type Assessment, type Finding } from '../../core'
+import { useState, type ReactNode } from 'react'
+import { HAZARDS, INDICATOR_BY_ID, describeInsight, missionOutlook, topLevel, worst, type Assessment, type Finding, type OutlookItem, type Status } from '../../core'
 import { formatDate } from '../format'
 import { useMission } from '../state'
-import { STATUS } from '../status'
+import ReportDialog from '../ReportDialog'
+import { STATUS, StatusBadge } from '../status'
 
 const LEVEL = { 1: 'Self-care', 2: 'Crew Medical Officer', 3: 'Flight surgeon' } as const
 const PARTS = [
@@ -29,7 +30,7 @@ function headline(a: Assessment): { lead: string; accent: string; lede: string }
   return { lead: 'Keep an', accent: 'eye out.', lede: 'Nothing needs action, but some signals are outside your usual range.' }
 }
 
-function Hero({ a, date, where, onOpenLog, onOpenBody }: { a: Assessment; date: string; where: string; onOpenLog: () => void; onOpenBody?: () => void }) {
+function Hero({ a, date, where, onOpenLog, onOpenBody, onOpenReport }: { a: Assessment; date: string; where: string; onOpenLog: () => void; onOpenBody?: () => void; onOpenReport?: () => void }) {
   const h = headline(a)
   const score = a.readiness.score
   // One colour for the whole screen: headline, orb, backdrop and the timeline bar
@@ -50,8 +51,13 @@ function Hero({ a, date, where, onOpenLog, onOpenBody }: { a: Assessment; date: 
           <button className="button primary-button" onClick={onOpenLog}>
             {a.due.length ? `Log ${a.due.length} due ${a.due.length === 1 ? 'reading' : 'readings'}` : 'Open daily log'} <span aria-hidden="true">→</span>
           </button>
+          {onOpenReport && (
+            <button className="button" onClick={onOpenReport}>
+              Ground report
+            </button>
+          )}
           {onOpenBody && (
-            <button className="button" onClick={onOpenBody}>
+            <button className="button ghost-button" onClick={onOpenBody}>
               Body map
             </button>
           )}
@@ -129,6 +135,8 @@ export function TodayView({
   onOpenLog,
   onOpenBody,
   onOpenTrends,
+  onOpenReport,
+  children,
   checklistScope = '',
   date = '',
   where = '',
@@ -137,6 +145,9 @@ export function TodayView({
   onOpenLog: () => void
   onOpenBody?: () => void
   onOpenTrends?: () => void
+  onOpenReport?: () => void
+  /** Extra sections rendered under the main grid. */
+  children?: ReactNode
   checklistScope?: string
   date?: string
   where?: string
@@ -147,7 +158,7 @@ export function TodayView({
   const insight = insights[0]
   return (
     <div>
-      <Hero a={assessment} date={date} where={where} onOpenLog={onOpenLog} onOpenBody={onOpenBody} />
+      <Hero a={assessment} date={date} where={where} onOpenLog={onOpenLog} onOpenBody={onOpenBody} onOpenReport={onOpenReport} />
 
       <div className="section today-grid">
         <section aria-labelledby="actions-title">
@@ -254,14 +265,78 @@ export function TodayView({
           )}
         </aside>
       </div>
+      {children}
     </div>
+  )
+}
+
+/** Where the slow, cumulative risks are heading if nothing changes. */
+function Outlook({ items, plannedDays }: { items: OutlookItem[]; plannedDays: number }) {
+  return (
+    <section className="section" aria-labelledby="outlook-title">
+      <div className="section-head">
+        <h2 id="outlook-title">Mission outlook</h2>
+        <span className="eyebrow">If nothing changes · to day {plannedDays}</span>
+      </div>
+      <div className="outlook-grid">
+        {items.map((item) => (
+          <article key={item.id} className={`card outlook ${STATUS[item.status].className}`}>
+            <div className="card-head">
+              <span className="eyebrow">{item.title}</span>
+              <StatusBadge status={item.status} />
+            </div>
+            <p className="outlook-value">{item.value}</p>
+            <p className="muted">{item.detail}</p>
+            {item.basis && (
+              <details>
+                <summary>How this is estimated</summary>
+                <p>{item.basis}</p>
+              </details>
+            )}
+          </article>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+/** Today's signals grouped by NASA's five hazards of human spaceflight. */
+function Hazards({ a }: { a: Assessment }) {
+  return (
+    <section className="section" aria-labelledby="hazards-title">
+      <div className="section-head">
+        <h2 id="hazards-title">The five hazards, today</h2>
+        <span className="eyebrow">NASA Human Research Program</span>
+      </div>
+      <ul className="hazard-row">
+        {HAZARDS.map((hazard, index) => {
+          const findings = a.findings.filter((f) => f.hazards.includes(hazard.id))
+          const flagged = a.indicators.filter((i) => (i.status === 'watch' || i.status === 'alert') && INDICATOR_BY_ID[i.id].hazards.includes(hazard.id))
+          const status: Status = worst('ok', ...flagged.map((i) => i.status), ...findings.map((f): Status => (f.level === 1 ? 'watch' : 'alert')))
+          const count = new Set([...findings.flatMap((f) => f.indicators), ...flagged.map((i) => i.id)]).size || findings.length
+          return (
+            <li key={hazard.id} className={`hazard ${STATUS[status].className}`}>
+              <span className="eyebrow">0{index + 1}</span>
+              <h3>{hazard.label}</h3>
+              <p className="muted">{hazard.about}</p>
+              <span className="hazard-state">
+                <i aria-hidden="true" />
+                {count ? `${count} ${count === 1 ? 'signal' : 'signals'} · ${STATUS[status].label}` : 'Quiet'}
+              </span>
+            </li>
+          )
+        })}
+      </ul>
+    </section>
   )
 }
 
 export default function Today({ onOpenLog, onOpenBody, onOpenTrends }: { onOpenLog: () => void; onOpenBody: () => void; onOpenTrends: () => void }) {
   const { assessment, crewId, day, envId, mission, records } = useMission()
+  const [report, setReport] = useState(false)
   return (
     <TodayView
+      onOpenReport={() => setReport(true)}
       checklistScope={`${envId}-${crewId}`}
       assessment={assessment}
       date={formatDate(records.find((record) => record.day === day)?.date)}
@@ -269,6 +344,10 @@ export default function Today({ onOpenLog, onOpenBody, onOpenTrends }: { onOpenL
       onOpenLog={onOpenLog}
       onOpenBody={onOpenBody}
       onOpenTrends={onOpenTrends}
-    />
+    >
+      <Outlook items={missionOutlook(records, day, mission.plannedDays)} plannedDays={mission.plannedDays} />
+      <Hazards a={assessment} />
+      <ReportDialog open={report} onClose={() => setReport(false)} />
+    </TodayView>
   )
 }
