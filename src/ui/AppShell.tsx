@@ -42,7 +42,7 @@ export default function AppShell() {
         <div className="wrap nav-inner">
           <div className="brand">
             <span className="brand-mark">CREW RECOVERY</span>
-            <span className="brand-sub eyebrow">
+            <span className="brand-sub">
               {mission.name} · Ground reply {roundTripDelayLabel(mission.env)}
             </span>
           </div>

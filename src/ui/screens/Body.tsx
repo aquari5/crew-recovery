@@ -15,19 +15,42 @@ import { STATUS, StatusBadge } from '../status'
 const LEVEL = { 1: 'Self-care', 2: 'Crew Medical Officer', 3: 'Flight surgeon' } as const
 const TREND = { up: '↑ Rising', down: '↓ Falling', flat: '→ Stable', none: '' } as const
 
-const SILHOUETTE =
-  'M160 45c-26 0-40 18-40 44 0 21 8 37 20 44v16l-42 12-18 72-10 88 20 5 20-83 10-25-4 98 9 160h25l10-130 10 130h25l9-160-4-98 10 25 20 83 20-5-10-88-18-72-42-12v-16c12-7 20-23 20-44 0-26-14-44-40-44Z'
+/**
+ * Stylised figure built from a few rounded shapes: a head, a torso and limbs
+ * drawn as thick round-capped strokes. Deliberately a pictogram, not anatomy.
+ */
+function Figure() {
+  return (
+    <g className="figure">
+      <defs>
+        <linearGradient id="figure-tone" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#e9eef5" />
+          <stop offset="1" stopColor="#cdd6e3" />
+        </linearGradient>
+      </defs>
+      {/* limbs */}
+      <path className="limb" strokeWidth="23" d="M99 154Q82 214 78 262L72 322" />
+      <path className="limb" strokeWidth="23" d="M221 154Q238 214 242 262L248 322" />
+      <path className="limb" strokeWidth="36" d="M138 292L134 384L132 456" />
+      <path className="limb" strokeWidth="36" d="M182 292L186 384L188 456" />
+      {/* torso, neck, head */}
+      <path className="mass" d="M128 124Q160 115 192 124Q214 129 213 154L206 246Q204 272 209 304L111 304Q116 272 114 246L107 154Q106 129 128 124Z" />
+      <rect className="mass" x="147" y="100" width="26" height="30" rx="10" />
+      <ellipse className="mass" cx="160" cy="74" rx="27" ry="32" />
+    </g>
+  )
+}
 
 /** Where each region's marker sits on the figure and which side its label goes. */
 const SPOTS: { id: BodyRegionId; x: number; y: number; side: 'left' | 'right'; label: string }[] = [
-  { id: 'wholeBody', x: 262, y: 92, side: 'right', label: 'Radiation' },
-  { id: 'head', x: 160, y: 70, side: 'left', label: 'Brain & sleep' },
-  { id: 'eyes', x: 172, y: 103, side: 'right', label: 'Eyes' },
-  { id: 'lungs', x: 138, y: 196, side: 'left', label: 'Air' },
-  { id: 'heart', x: 174, y: 212, side: 'right', label: 'Heart' },
-  { id: 'gut', x: 160, y: 286, side: 'left', label: 'Nutrition' },
-  { id: 'skin', x: 226, y: 300, side: 'right', label: 'Immune & skin' },
-  { id: 'musculoskeletal', x: 138, y: 396, side: 'left', label: 'Bones & muscle' },
+  { id: 'head', x: 160, y: 62, side: 'left', label: 'Brain & sleep' },
+  { id: 'eyes', x: 171, y: 80, side: 'right', label: 'Eyes' },
+  { id: 'wholeBody', x: 262, y: 122, side: 'right', label: 'Radiation' },
+  { id: 'lungs', x: 136, y: 168, side: 'left', label: 'Air' },
+  { id: 'heart', x: 176, y: 186, side: 'right', label: 'Heart' },
+  { id: 'gut', x: 160, y: 252, side: 'left', label: 'Nutrition' },
+  { id: 'skin', x: 242, y: 262, side: 'right', label: 'Immune & skin' },
+  { id: 'musculoskeletal', x: 135, y: 384, side: 'left', label: 'Bones & muscle' },
 ]
 
 function Source({ source }: { source: string }) {
@@ -150,7 +173,7 @@ function BodyMap({ assessment, selected, onSelect }: { assessment: Assessment; s
   return (
     <svg className="body-map" viewBox="-96 28 512 456" role="group" aria-label="Body map. Select a region to inspect its health signals.">
       <ellipse className={`figure-halo ${STATUS[halo].className}`} cx="160" cy="256" rx="128" ry="222" />
-      <path className="figure-fill" d={SILHOUETTE} />
+      <Figure />
       {SPOTS.map((spot) => {
         const status = assessment.regions[spot.id]
         const labelX = spot.side === 'left' ? 28 : 292
@@ -208,6 +231,15 @@ export default function Body() {
           </span>
         </div>
         <BodyMap assessment={assessment} selected={selected} onSelect={setSelected} />
+        {/* On small screens the labels on the figure are too small to read, so the regions are also listed as chips. */}
+        <div className="region-chips" role="group" aria-label="Body regions">
+          {SPOTS.map((spot) => (
+            <button key={spot.id} className={`region-chip ${STATUS[assessment.regions[spot.id]].className}`} aria-pressed={selected === spot.id} onClick={() => setSelected(spot.id)}>
+              <i aria-hidden="true" />
+              {spot.label}
+            </button>
+          ))}
+        </div>
         <div className="body-legend" aria-label="Status legend">
           {(['ok', 'watch', 'alert', 'nodata'] as const).map((status) => (
             <StatusBadge key={status} status={status} />

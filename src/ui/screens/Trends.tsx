@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { CartesianGrid, Line, LineChart, ReferenceArea, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { INDICATOR_BY_ID, JOURNAL_BY_KEY, describeInsight, formatValue, type IndicatorId, type Insight } from '../../core'
+import { INDICATOR_BY_ID, JOURNAL_BY_KEY, formatValue, type IndicatorId, type Insight } from '../../core'
 import { formatDate } from '../format'
 import { useMission } from '../state'
 import { STATUS, StatusBadge } from '../status'
@@ -10,23 +10,60 @@ import { useReducedMotion } from '../useReducedMotion'
 const ZONE = { watch: '#e59a1a', alert: '#dc3d43' } as const
 const TICK = { fill: '#667085', fontSize: 11, fontFamily: 'var(--mono)' }
 
-function InsightRow({ insight }: { insight: Insight }) {
+/** Shorter names for the indicator list, where space is tight. */
+const SHORT: Partial<Record<IndicatorId, string>> = {
+  restingHR: 'Resting HR',
+  hrv: 'HRV',
+  bpSys: 'BP systolic',
+  bpDia: 'BP diastolic',
+  temp: 'Temperature',
+  glucose: 'Fasting glucose',
+  exercise: 'Exercise · 7-day',
+  radiation: 'Radiation today',
+}
+
+function delta(insight: Insight): string {
   const def = INDICATOR_BY_ID[insight.metric]
-  const sign = insight.diff > 0 ? '+' : '−'
+  const amount = Math.abs(insight.diff).toFixed(Math.max(1, def.decimals))
+  return `${insight.diff > 0 ? '+' : '−'}${amount}${def.unit.startsWith('/') ? ' pt' : ` ${def.unit}`}`
+}
+
+/** One row per behaviour: its strongest effect large, the other effects as chips. */
+function InsightRow({ group }: { group: Insight[] }) {
+  const [main, ...rest] = group
+  const def = INDICATOR_BY_ID[main.metric]
+  const sameDay = ['mood', 'energy', 'stress'].includes(main.metric)
   return (
-    <article className={`insight ${insight.good ? 'status-good' : 'status-watch'}`}>
+    <article className={`insight ${main.good ? 'status-good' : 'status-watch'}`}>
       <div className="insight-delta">
-        {sign}
-        {Math.abs(insight.diff).toFixed(Math.max(1, def.decimals))} {def.unit}
-        <small>{def.label}</small>
+        {delta(main)}
+        <small>{SHORT[main.metric] ?? def.label}</small>
       </div>
       <div>
-        <h4>{JOURNAL_BY_KEY[insight.behavior].label}</h4>
-        <p className="muted">{describeInsight(insight)}</p>
+        <h4>{JOURNAL_BY_KEY[main.behavior].label}</h4>
+        <p className="muted">
+          {def.label} is {main.diff > 0 ? 'higher' : 'lower'} {sameDay ? 'on the same day' : 'the following night'}. Seen on {main.nWith} days with it,
+          compared with {main.nWithout} without.
+        </p>
+        {rest.length > 0 && (
+          <ul className="insight-chips">
+            {rest.map((other) => (
+              <li key={other.metric}>
+                {SHORT[other.metric] ?? INDICATOR_BY_ID[other.metric].label} {delta(other)}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
-      <StatusBadge status={insight.good ? 'ok' : 'watch'} />
+      <StatusBadge status={main.good ? 'ok' : 'watch'} />
     </article>
   )
+}
+
+function groupByBehavior(insights: Insight[]): Insight[][] {
+  const groups = new Map<string, Insight[]>()
+  for (const insight of insights) groups.set(insight.behavior, [...(groups.get(insight.behavior) ?? []), insight])
+  return [...groups.values()]
 }
 
 export default function Trends() {
@@ -48,7 +85,7 @@ export default function Trends() {
           {assessment.indicators.map((item) => (
             <button key={item.id} className={`metric ${STATUS[item.status].className}`} aria-pressed={indicator === item.id} onClick={() => setIndicator(item.id)}>
               <i aria-hidden="true" />
-              <span>{INDICATOR_BY_ID[item.id].label}</span>
+              <span>{SHORT[item.id] ?? INDICATOR_BY_ID[item.id].label}</span>
               <b>{formatValue(item.id, item.value)}</b>
             </button>
           ))}
@@ -106,7 +143,7 @@ export default function Trends() {
                   />
                   <Line
                     key={indicator}
-                    type="monotone"
+                    type="linear"
                     dataKey="value"
                     name={definition.label}
                     stroke="#0a1020"
@@ -187,9 +224,11 @@ export default function Trends() {
         </div>
         {assessment.insights.length ? (
           <div className="insights">
-            {assessment.insights.slice(0, 8).map((insight) => (
-              <InsightRow key={insight.behavior + insight.metric} insight={insight} />
-            ))}
+            {groupByBehavior(assessment.insights)
+              .slice(0, 7)
+              .map((group) => (
+                <InsightRow key={group[0].behavior} group={group} />
+              ))}
           </div>
         ) : (
           <p className="muted">At least 5 days with and 5 days without a behaviour are needed before a pattern is shown.</p>

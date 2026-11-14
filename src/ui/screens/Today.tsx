@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { describeInsight, topLevel, type Assessment, type Finding, type Status } from '../../core'
+import { INDICATOR_BY_ID, describeInsight, topLevel, type Assessment, type Finding } from '../../core'
 import { formatDate } from '../format'
 import { useMission } from '../state'
 import { STATUS } from '../status'
@@ -13,25 +13,31 @@ const PARTS = [
 ] as const
 
 /** The one sentence the astronaut should take away, picked from the most urgent finding. */
-function headline(a: Assessment): { lead: string; accent: string; tone: Status; lede: string } {
+function headline(a: Assessment): { lead: string; accent: string; lede: string } {
   const level = topLevel(a.findings)
   const first = a.findings[0]
   const more = a.findings.length > 1 ? ` ${a.findings.length - 1} more below.` : ''
-  if (level === 3) return { lead: 'Call the', accent: 'ground.', tone: 'alert', lede: `${first.title}. Start the steps now and send the data in parallel.${more}` }
-  if (level === 2) return { lead: 'Bring in', accent: 'your medic.', tone: 'alert', lede: `${first.title}. Involve the Crew Medical Officer today.${more}` }
-  if (level === 1) return { lead: 'Ease into', accent: 'today.', tone: 'watch', lede: `${first.title}. You can handle this yourself.${more}` }
-  if (a.overall === 'nodata') return { lead: 'Check in', accent: 'to begin.', tone: 'nodata', lede: 'There is not enough recent data to assess your health. Log today’s measurements.' }
-  if (a.overall === 'ok') return { lead: 'Cleared', accent: 'for the day.', tone: 'ok', lede: 'Every signal is inside its reference range and your own normal. Keep the routine.' }
-  return { lead: 'Keep an', accent: 'eye out.', tone: 'watch', lede: 'Nothing needs action, but some signals are outside your usual range.' }
+  if (level === 3) return { lead: 'Call the', accent: 'ground.', lede: `${first.title}. Start the steps now and send the data in parallel.${more}` }
+  if (level === 2) return { lead: 'Bring in', accent: 'your medic.', lede: `${first.title}. Involve the Crew Medical Officer today.${more}` }
+  if (a.overall === 'alert') {
+    const red = a.indicators.filter((i) => i.status === 'alert').map((i) => INDICATOR_BY_ID[i.id].label.toLowerCase())
+    return { lead: 'Act on', accent: 'the red signals.', lede: `Outside the safe range today: ${red.join(', ') || 'see below'}. Re-measure, then follow the steps below.` }
+  }
+  if (level === 1) return { lead: 'Ease into', accent: 'today.', lede: `${first.title}. You can handle this yourself.${more}` }
+  if (a.overall === 'nodata') return { lead: 'Check in', accent: 'to begin.', lede: 'There is not enough recent data to assess your health. Log today’s measurements.' }
+  if (a.overall === 'ok') return { lead: 'Cleared', accent: 'for the day.', lede: 'Every signal is inside its reference range and your own normal. Keep the routine.' }
+  return { lead: 'Keep an', accent: 'eye out.', lede: 'Nothing needs action, but some signals are outside your usual range.' }
 }
 
 function Hero({ a, date, where, onOpenLog, onOpenBody }: { a: Assessment; date: string; where: string; onOpenLog: () => void; onOpenBody?: () => void }) {
   const h = headline(a)
   const score = a.readiness.score
-  const orbStatus = score === null ? 'nodata' : a.readiness.status
+  // One colour for the whole screen: headline, orb, backdrop and the timeline bar
+  // for this day all show the day's overall status. The number is the readiness score.
+  const tone = a.overall
   return (
     <section className="hero" aria-labelledby="today-headline">
-      <div className={STATUS[h.tone].className}>
+      <div className={STATUS[tone].className}>
         <p className="eyebrow">
           Day {String(a.day).padStart(3, '0')} · {date}
           {where && ` · ${where}`}
@@ -68,16 +74,19 @@ function Hero({ a, date, where, onOpenLog, onOpenBody }: { a: Assessment; date: 
       </div>
       <div className="orb-wrap">
         <div
-          className={`orb ${STATUS[orbStatus].className}`}
-          data-status={orbStatus}
+          className={`orb ${STATUS[tone].className}`}
+          data-status={tone}
           role="img"
-          aria-label={score === null ? 'Readiness: not enough data' : `Readiness: ${score} out of 100, ${STATUS[orbStatus].label}`}
+          aria-label={score === null ? 'Readiness: not enough data' : `Readiness: ${score} out of 100. Overall status: ${STATUS[tone].label}`}
         >
           <span className="orb-glow" aria-hidden="true" />
           <span className="orb-core" aria-hidden="true" />
           <span className="orb-label" aria-hidden="true">
             <span className="orb-score">{score ?? '—'}</span>
             <span className="orb-caption">{score === null ? 'Not enough data' : 'Daily readiness'}</span>
+            <span className="orb-status">
+              <i /> {STATUS[tone].label}
+            </span>
           </span>
         </div>
       </div>

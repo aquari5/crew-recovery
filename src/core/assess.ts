@@ -16,6 +16,7 @@ import type {
   Finding,
   IndicatorResult,
   MissionEnvironment,
+  Readiness,
   Status,
 } from './types'
 
@@ -44,6 +45,16 @@ function regionStatuses(
   return out
 }
 
+/** The single status of a day. The hero, the orb and the timeline all show this value. */
+function overallStatus(indicators: IndicatorResult[], findings: Finding[], readiness: Readiness): Status {
+  return worst(
+    ...indicators.map((i) => i.status),
+    ...findings.map((f) => LEVEL_STATUS[f.level]),
+    // Readiness is a summary score: on its own it can ask for attention, not raise an alarm.
+    readiness.status === 'alert' ? 'watch' : readiness.status,
+  )
+}
+
 /**
  * Full assessment of one crew member on mission day `day`.
  * `records` must be sorted by day; later days are ignored.
@@ -56,12 +67,7 @@ export function assess(records: DailyRecord[], day: number, env: MissionEnvironm
   const readiness = computeReadiness(hist, day)
   const cumulative = finite(hist.map((r) => r.values.radiation)).reduce((a, b) => a + b, 0)
 
-  const overall = worst(
-    ...indicators.map((i) => i.status),
-    ...findings.map((f) => LEVEL_STATUS[f.level]),
-    // Readiness is a summary score: on its own it can ask for attention, not raise an alarm.
-    readiness.status === 'alert' ? 'watch' : readiness.status,
-  )
+  const overall = overallStatus(indicators, findings, readiness)
 
   return {
     day,
@@ -98,16 +104,14 @@ export interface TimelineDay {
 
 /**
  * Status of every mission day, for the timeline strip. Cheaper than calling
- * `assess` per day: it skips insights, tasks and points.
+ * `assess` per day: it skips insights, tasks and points. The status is the same
+ * value as `assess(...).overall` for that day.
  */
 export function missionTimeline(records: DailyRecord[], env: MissionEnvironment): TimelineDay[] {
   return records.map((r) => {
     const hist = upTo(records, r.day)
     const findings = findFindings(hist, r.day, env)
-    const status = worst(
-      ...evaluateAll(hist, r.day).map((i) => i.status),
-      ...findings.map((f) => LEVEL_STATUS[f.level]),
-    )
+    const status = overallStatus(evaluateAll(hist, r.day), findings, computeReadiness(hist, r.day))
     return { day: r.day, status, level: topLevel(findings) }
   })
 }
