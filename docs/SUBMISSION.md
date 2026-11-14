@@ -61,7 +61,7 @@ NASA data and resources are the basis of the tool's rules, not an addition to th
 - **NASA-STD-3001** (Vol. 1 and 2) and the **NASA OCHMO technical briefs** on carbon dioxide and radiation protection: the 600 mSv career dose limit and the cabin CO₂ limits (3 mmHg 1-hour average, 2.5 mmHg 7-day average) are the thresholds the app uses.
 - **Mars Science Laboratory RAD measurements** (Zeitlin et al., Science 2013): the 1.8 mSv/day deep-space dose rate drives the radiation model and the end-of-mission projection.
 - **NASA-funded ISS sleep study** (Barger et al., Lancet Neurology 2014): the 6.09 h crew average is shown next to the user's own sleep.
-- **ISS body mass measurements with SLAMMD** (Zwart et al. 2014): the measured crew mass loss is shown next to the user's own trend, and the −5% / −10% rules follow it.
+- **ISS body mass measurements with SLAMMD** (Zwart et al. 2014): the measured crew mass loss is shown next to the user's own trend.
 - **NASA, Wearable Tech for Space Station Research**: confirms that sleep, CO₂ exposure and radiation are measured with crew-worn devices today; each indicator in the app names its flight hardware.
 - **NASA HRP bone loss rate** (1–1.5% per month without countermeasures): used in the bone outlook.
 
