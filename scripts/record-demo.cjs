@@ -263,80 +263,81 @@ const real = (ms) => new Promise((r) => setTimeout(r, ms))
   const bg = (p) => p.catch((e) => console.error('step failed:', e.message))
 
   if (FILM === 'demo') {
+    // Scene times follow the recorded voice-over (see docs/SUBMISSION.md).
     // 0.0  Cold open
     await S('card', '<div class="mark">TEAM EZ AQLIMCZAK</div><div class="big">{{On the way to Mars,\na doctor is *20 minutes* away.}}</div>')
-    await at(2.7)
+    await at(3.2)
     await S('card', null)
-    await at(3.0)
+    await at(3.5)
 
-    // 3.0  The product
+    // 3.5  The product
     bg(S('winIn', 1000))
     await S('cap', '*Crew Recovery.* Health autonomy for deep space.')
-    await at(5.6)
+    await at(6.9)
 
-    // 5.6  One answer
+    // 6.9  One answer
     bg(S('cam', 500, 250, 1.5, 1100))
     await S('cap', 'Every morning, one answer:\n*am I fit for today?*')
-    await at(8.3)
+    await at(11.0)
 
-    // 8.3  Sleep debt, then fever
-    bg(S('cam', 640, 360, 1.16, 900))
+    // 11.0  Sleep debt, then fever
+    bg(S('cam', 640, 360, 1.16, 800))
     await S('cap', 'It catches *sleep debt* building…')
-    await at(8.8)
+    await at(11.3)
     await scrub(44, 0.9)
-    await at(10.7)
+    await at(12.9)
     await S('cap', '…and the *fever* that follows.')
     await scrub(47, 0.4)
-    await at(11.5)
-    bg(S('cam', 520, 400, 1.42, 1000))
-    bg(scrollTo('.action-cards', 1000, 150))
-    await at(13.5)
+    await at(13.4)
+    bg(S('cam', 520, 400, 1.42, 900))
+    bg(scrollTo('.action-cards', 900, 150))
+    await at(14.6)
 
-    // 13.5  Solar storm and the report home
-    bg(scrollTo(null, 600))
-    bg(S('cam', 640, 360, 1.16, 800))
+    // 14.6  Solar storm and the report home
+    bg(scrollTo(null, 500))
+    bg(S('cam', 640, 360, 1.16, 700))
     await S('cap', 'Solar storm: *what to do, and who to tell.*')
-    await scrub(78, 0.8)
-    await at(15.3)
+    await scrub(78, 0.7)
+    await at(16.2)
     await S('showCursor', 640, 470)
-    await click(app.getByRole('button', { name: 'Ground report' }))
-    await at(16.4)
-    bg(S('cam', 640, 350, 1.36, 1000))
+    await click(app.getByRole('button', { name: 'Ground report' }), 650)
+    await at(17.1)
+    bg(S('cam', 640, 350, 1.36, 900))
     await S('cap', 'One complete report to Earth.\n*Every question costs 40 minutes.*')
-    await at(18.3)
+    await at(19.4)
 
-    // 18.3  Body
-    await click(app.getByRole('button', { name: 'Close report' }), 700)
-    await S('cam', 640, 360, 1.16, 600)
-    await click(tab('Body'), 700)
-    await S('cap', 'Every signal *explains itself.*')
-    await at(20.0)
-    await S('cam', 330, 330, 1.75, 900)
-    await click(app.locator('.hotspot[aria-label^="Heart"] .dot'), 600)
-    await at(21.6)
+    // 19.4  Body
     await S('hideCursor')
-    bg(S('cam', 760, 380, 1.4, 1000))
-    await at(22.6)
+    await app.getByRole('button', { name: 'Close report' }).dispatchEvent('click')
+    await tab('Body').dispatchEvent('click')
+    await S('cap', 'Every signal *explains itself.*')
+    await S('cam', 330, 330, 1.75, 900)
+    await S('showCursor', 300, 250)
+    await click(app.locator('.hotspot[aria-label^="Heart"] .dot'), 600)
+    await at(21.4)
+    await S('hideCursor')
+    bg(S('cam', 760, 380, 1.4, 700))
+    await at(22.1)
 
-    // 22.6  Patterns
+    // 22.1  Patterns
     await setDay(120)
     await tab('Trends').dispatchEvent('click')
-    bg(S('cam', 640, 360, 1.34, 900))
-    bg(scrollTo('#patterns-title', 1000, 110))
+    bg(S('cam', 640, 360, 1.34, 800))
+    bg(scrollTo('#patterns-title', 900, 110))
     await S('cap', 'It learns what helps *you* recover.\nTested against *false patterns.*')
-    await at(25.4)
+    await at(23.9)
 
-    // 25.4  Outlook
+    // 23.9  Outlook
     await tab('Today').dispatchEvent('click')
-    bg(scrollTo('#outlook-title', 900, 150))
-    bg(S('cam', 640, 340, 1.3, 900))
+    bg(scrollTo('#outlook-title', 800, 150))
+    bg(S('cam', 640, 340, 1.3, 800))
     await S('cap', 'And shows where the *slow risks* are heading.')
-    await at(27.6)
+    await at(26.1)
 
-    // 27.6  End card
+    // 26.1  End card
     await S('cap', '')
-    bg(S('winOut', 600))
-    await at(28.0)
+    bg(S('winOut', 500))
+    await at(26.5)
     await S('card', '<div class="mark">CREW RECOVERY · TEAM EZ AQLIMCZAK</div><div class="big">{{No server.\n*No link to Earth* needed.}}</div><div class="url">github.com/aquari5/crew-recovery</div>')
     await at(END + 0.2)
   } else {

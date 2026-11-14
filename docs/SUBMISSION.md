@@ -89,25 +89,22 @@ Yes. Claude (Anthropic), through Claude Code, was used as a coding assistant dur
 
 ## Demo video (29.6 seconds)
 
-`docs/demo.mp4`, 1920×1080, 60 fps, no sound. The Project Submission Guide sets a hard limit of 30 seconds; a longer demo is not eligible for global judging, so the voice-over has to end by 29.6 s. Team: **EZ Aqlimczak** (shown on the opening and closing cards).
+`docs/demo.mp4`, 1920×1080, 60 fps, with voice-over, 29.6 s. The Project Submission Guide sets a hard limit of 30 seconds; a longer demo is not eligible for global judging. Team: **EZ Aqlimczak** (shown on the opening and closing cards).
 
-### Voice-over script
+### Voice-over
 
-About 70 words. Read calmly; each line starts at the time shown and must end before the next one.
+The recorded voice is in `docs/voice/demo.mp3`. The film's scenes were retimed to it and each phrase was placed on its scene with `scripts/mix-audio.py`.
 
-| Start | Line | On screen |
+| Starts | Line | On screen |
 |---|---|---|
-| 0.0 | On the way to Mars, a doctor is twenty minutes away. | Title card |
-| 3.0 | We're EZ Aqlimczak, and this is Crew Recovery. | The app appears, a calm day |
-| 5.6 | Every morning it answers one question: am I fit for today? | Headline and readiness score |
-| 8.5 | It catches sleep debt building, | Timeline moves to day 44 |
-| 10.7 | and the fever that follows. | Day 47, steps to take |
-| 13.6 | In a solar storm it says what to do, | Day 78 |
-| 16.4 | and writes one complete report to Earth. | Ground report |
-| 19.0 | Every signal explains itself. | Body map |
-| 22.8 | It learns what helps you recover, | Patterns |
-| 25.5 | and shows where slow risks are heading. | Mission outlook |
-| 27.9 | No server. No link to Earth needed. | End card |
+| 0.2 | On the way to Mars, a doctor is twenty minutes away. | Title card |
+| 3.7 | We're EZ Aqlimczak, and this is Crew Recovery. | The app appears, a calm day |
+| 7.2 | Every morning it answers one question: am I fit for today? | Headline and readiness score |
+| 11.2 | It catches sleep debt building, and the fever that follows. | Days 44 and 47, steps to take |
+| 14.8 | In a solar storm it says what to do, and writes one complete report to Earth. | Day 78, ground report |
+| 19.6 | Every signal explains itself. | Body map |
+| 22.2 | It learns what helps you recover, and shows where slow risks are heading. | Patterns, mission outlook |
+| 26.5 | No server. No link to Earth needed. | End card |
 
 Rules from the guide for the sound: the speaker must be 18 or older; narration in another language is allowed only with English captions (the video has them); an AI-generated voice must be acknowledged in the project description.
 
@@ -117,9 +114,9 @@ The video is a capture of the real application driven by `scripts/record-demo.cj
 
 On the first visit the app opens a "How to use" dialog with a 38-second walk-through (`public/tour.mp4`) and the same steps as text. It can be reopened with the "?" button in the header.
 
-### Voice-over script for the walk-through (optional)
+### Voice-over for the walk-through
 
-The guide plays muted until the viewer turns the sound on, so the captions carry it on their own. If a voice is recorded, it must end by 38.4 s.
+The guide plays muted until the viewer turns the sound on, so the captions carry it on their own. The recorded voice is in `docs/voice/tour.mp3` and is mixed into `public/tour.mp4`.
 
 | Start | Line |
 |---|---|
