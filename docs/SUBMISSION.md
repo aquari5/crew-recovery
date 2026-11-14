@@ -36,7 +36,7 @@ All health logic is deterministic TypeScript with tests (56). Nothing is compute
 - "Not measured" is never shown as "fine". Missing data has its own state throughout.
 - The correlation engine compares days with and without each logged behaviour. A pattern is shown only if it is at least moderate in size (Cohen's d ≥ 0.5), survives a correction for the roughly 70 comparisons made at once (Welch's t-test with Benjamini–Hochberg), and is still there in a multiple regression with all other behaviours accounted for.
 - The engine was tested on generated data with known truth (`docs/VALIDATION.md`). The first version showed 3.1 false patterns per astronaut on data with no effects; the current one shows 0.13, and still finds a strong real effect 93% of the time within 120 days.
-- Entries are stored on the device. There is no backend.
+- Entries are stored on the device. There is no backend. After the first visit the app is kept on the device by a service worker and opens with no network at all, which is the situation it is built for.
 
 ### Data
 
@@ -80,7 +80,7 @@ Full list with links and licences: `docs/SOURCES.md`.
 
 ## Use of Super Intelligence (SI)
 
-Yes. Claude (Anthropic), through Claude Code, was used as a coding assistant during the hackathon to write the health logic, its tests, the user interface, the shader that draws the 3D body figure, the documentation, and the script that records the demo video from the running application. Codex (OpenAI) was used to write the first version of the user interface. The team chose the challenge, set the direction, made the design and scope decisions and reviewed the results. The application itself does not call any AI model: every number and recommendation is computed by deterministic, tested code. No images, audio or video were produced by a generative model. Details: "Use of AI tools" in `docs/SOURCES.md`.
+Yes. Claude (Anthropic), through Claude Code, was used as a coding assistant during the hackathon to write the health logic, its tests, the user interface, the shader that draws the 3D body figure, the documentation, and the script that records the demo video from the running application. Codex (OpenAI) wrote an early version of the user interface; some of its form and list code is still in use. The team chose the challenge, set the direction, made the design and scope decisions and reviewed the results. The application itself does not call any AI model: every number and recommendation is computed by deterministic, tested code. No images, audio or video were produced by a generative model. Details: "Use of AI tools" in `docs/SOURCES.md`.
 
 ## Links for the form
 

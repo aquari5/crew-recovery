@@ -68,7 +68,7 @@ export default function Guide({ open, onClose }: { open: boolean; onClose: () =>
             </li>
           ))}
         </ol>
-        <p className="muted guide-note">The demo shows a synthetic Mars transit with a crew of four. What you enter stays on this device.</p>
+        <p className="muted guide-note">The demo shows a synthetic Mars transit with a crew of four. What you enter stays on this device, and after this first visit the app opens with no network at all.</p>
         <div className="sheet-actions">
           <button type="button" className="button primary-button" onClick={close}>
             Start

@@ -1,0 +1,11 @@
+{
+  "name": "Crew Recovery",
+  "short_name": "Crew Recovery",
+  "description": "Health monitoring for astronauts on long-duration missions. Works with no link to Earth.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f3f5f8",
+  "theme_color": "#f3f5f8",
+  "icons": [{ "src": "crew-recovery.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
