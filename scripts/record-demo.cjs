@@ -47,7 +47,8 @@ html,body{width:1920px;height:1080px;overflow:hidden;background:#04070e;font-fam
 #card .mark{font-family:GM,monospace;font-size:24px;letter-spacing:.42em;font-weight:600;color:rgba(255,255,255,.72)}
 #card .sub{font-size:34px;letter-spacing:-.02em;color:rgba(255,255,255,.66);font-weight:450}
 #card .url{font-family:GM,monospace;font-size:20px;letter-spacing:.06em;color:rgba(255,255,255,.5)}
-#cur{position:fixed;left:0;top:0;width:44px;height:44px;margin:-4px 0 0 -6px;pointer-events:none;opacity:0;transition:opacity .35s ease;will-change:transform;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45));transform-origin:8px 6px}
+#cur{position:fixed;left:0;top:0;width:44px;height:44px;margin:-4px 0 0 -6px;pointer-events:none;opacity:0;transition:opacity .35s ease;will-change:transform;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45))}
+#cur svg{display:block;width:44px;height:44px;transform-origin:10px 6px}
 #rip{position:fixed;left:0;top:0;width:70px;height:70px;margin:-35px 0 0 -35px;border-radius:50%;border:3px solid rgba(255,255,255,.95);box-shadow:0 0 0 2px rgba(60,110,255,.6);opacity:0;pointer-events:none}
 #rip.go{animation:rip .55s cubic-bezier(.23,1,.32,1)}
 @keyframes rip{from{opacity:.95;transform:translate(var(--x),var(--y)) scale(.25)}to{opacity:0;transform:translate(var(--x),var(--y)) scale(1.25)}}
@@ -55,7 +56,7 @@ html,body{width:1920px;height:1080px;overflow:hidden;background:#04070e;font-fam
 <div id="bg"></div>
 <div id="win"><iframe src="/"></iframe></div>
 <div id="scrim"></div>
-<svg id="cur" viewBox="0 0 24 24"><path d="M5 3l14 8.2-6.2 1.5 3.6 7-2.7 1.4-3.6-7L5 18.6z" fill="#0b1020" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>
+<div id="cur"><svg viewBox="0 0 24 24"><path d="M5 3l14 8.2-6.2 1.5 3.6 7-2.7 1.4-3.6-7L5 18.6z" fill="#0b1020" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
 <div id="rip"></div>
 <div id="card"></div>
 <div id="cap"></div>
@@ -125,19 +126,24 @@ const S = window.S = {
   cursor(x, y, ms) {
     const a = { ...S.pos }
     const dist = Math.hypot(x - a.x, y - a.y)
-    const dur = ms ?? Math.max(450, Math.min(1000, 300 + dist * 1.1))
-    const bend = Math.min(26, dist * .06)
+    const dur = ms ?? Math.max(600, Math.min(1400, 380 + dist * 1.5))
+    const bend = Math.min(18, dist * .04)
     $('cur').style.opacity = 1
-    return tween(dur, (t) => { S.pos = { x: a.x + (x-a.x)*t, y: a.y + (y-a.y)*t - Math.sin(t*Math.PI)*bend }; S.drawCursor() }, (t) => (t < .5 ? 16*t*t*t*t*t : 1 - Math.pow(-2*t+2, 5)/2))
+    return tween(dur, (t) => { S.pos = { x: a.x + (x-a.x)*t, y: a.y + (y-a.y)*t - Math.sin(t*Math.PI)*bend }; S.drawCursor() }, (t) => t*t*(3 - 2*t))
   },
   click() {
     const r = $('rip'), c = $('cur'), m = c.style.transform.match(/translate\\(([-\\d.]+)px,\\s*([-\\d.]+)px\\)/)
     r.style.setProperty('--x', m[1] + 'px'); r.style.setProperty('--y', m[2] + 'px')
     r.classList.remove('go'); void r.offsetWidth; r.classList.add('go')
-    c.animate([{ scale: 1 }, { scale: .8 }, { scale: 1 }], { duration: 300, easing: 'ease-out' })
+    // Scale the arrow inside its wrapper: scaling the wrapper would scale its translation too and make the cursor jump.
+    c.firstElementChild.animate([{ transform: 'scale(1)' }, { transform: 'scale(.8)' }, { transform: 'scale(1)' }], { duration: 300, easing: 'ease-out' })
   },
 }
 S.apply(S.camState, 0)
+// Samples where the arrow really is on screen, for checking the film for jumps.
+window.__track = []
+const sample = () => { const r = $('cur').firstElementChild.getBoundingClientRect(); window.__track.push({ t: performance.now(), x: r.x, y: r.y, o: +getComputedStyle($('cur')).opacity }); requestAnimationFrame(sample) }
+requestAnimationFrame(sample)
 </script></body></html>`
 
 // Slows every JavaScript clock in the page; CSS animations are slowed through DevTools.
@@ -297,18 +303,17 @@ const real = (ms) => new Promise((r) => setTimeout(r, ms))
     await at(16.4)
     bg(S('cam', 640, 350, 1.36, 1000))
     await S('cap', 'One complete report to Earth.\n*Every question costs 40 minutes.*')
-    await at(18.6)
+    await at(18.3)
 
-    // 18.6  Body
-    await click(app.getByRole('button', { name: 'Close report' }))
-    bg(S('cam', 640, 360, 1.16, 700))
-    await click(tab('Body'))
+    // 18.3  Body
+    await click(app.getByRole('button', { name: 'Close report' }), 700)
+    await S('cam', 640, 360, 1.16, 600)
+    await click(tab('Body'), 700)
     await S('cap', 'Every signal *explains itself.*')
     await at(20.0)
-    bg(S('cam', 330, 330, 1.75, 1100))
-    await at(20.6)
-    await click(app.locator('.hotspot[aria-label^="Heart"] .dot'))
-    await at(21.5)
+    await S('cam', 330, 330, 1.75, 900)
+    await click(app.locator('.hotspot[aria-label^="Heart"] .dot'), 600)
+    await at(21.6)
     await S('hideCursor')
     bg(S('cam', 760, 380, 1.4, 1000))
     await at(22.6)
@@ -375,16 +380,14 @@ const real = (ms) => new Promise((r) => setTimeout(r, ms))
     await at(22.8)
 
     await click(app.getByRole('button', { name: 'Close guided measurement' }))
-    bg(S('cam', 640, 360, 1.16, 700))
+    await S('cam', 640, 360, 1.16, 600)
     await click(tab('Body'))
     await S('cap', '*Body.* Select a region to see its signals.')
     await at(24.4)
-    bg(S('cam', 330, 330, 1.75, 1100))
-    await at(25.2)
-    await click(app.locator('.hotspot[aria-label^="Heart"] .dot'))
+    await S('cam', 330, 330, 1.75, 900)
+    await click(app.locator('.hotspot[aria-label^="Heart"] .dot'), 600)
     await at(26.2)
-    bg(S('cam', 760, 380, 1.4, 1000))
-    await at(27.0)
+    await S('cam', 760, 380, 1.4, 800)
     await click(app.locator('.body-indicator summary', { hasText: 'How to measure' }).first())
     await at(28.6)
 
@@ -412,6 +415,18 @@ const real = (ms) => new Promise((r) => setTimeout(r, ms))
   }
 
   recording = false
+  if (process.env.TRACK) {
+    // Largest distance the visible cursor travelled between two animation frames, in stage pixels.
+    const track = await page.evaluate(() => window.__track)
+    let worst = { d: 0 }
+    for (let i = 1; i < track.length; i++) {
+      const a = track[i - 1], b = track[i]
+      if (a.o < 0.5 || b.o < 0.5) continue
+      const d = Math.hypot(b.x - a.x, b.y - a.y), dt = b.t - a.t
+      if (d / Math.max(dt, 1) > (worst.v ?? 0)) worst = { d: Math.round(d), dt: Math.round(dt), v: d / Math.max(dt, 1), at: (b.t / 1000).toFixed(2) }
+    }
+    console.log('cursor samples', track.length, 'fastest step', JSON.stringify(worst))
+  }
   await grabber
   await browser.close()
 

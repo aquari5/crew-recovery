@@ -96,6 +96,23 @@ The video is a capture of the real application driven by `scripts/record-demo.cj
 
 On the first visit the app opens a "How to use" dialog with a 38-second walk-through (`public/tour.mp4`) and the same steps as text. It can be reopened with the "?" button in the header.
 
+### Voice-over script for the walk-through (optional)
+
+The guide plays muted until the viewer turns the sound on, so the captions carry it on their own. If a voice is recorded, it must end by 38.4 s.
+
+| Start | Line |
+|---|---|
+| 0.0 | Today. Start here each morning. |
+| 3.8 | The cards say what to do, and who to involve. |
+| 7.4 | Timeline. Drag to revisit any mission day. |
+| 11.8 | Or press Story for the key moments. |
+| 14.8 | Log. Two minutes: how you feel, what you did, your measurements. |
+| 19.8 | Blood pressure has a guided mode. |
+| 22.8 | Body. Select a region to see its signals. |
+| 28.6 | Trends. See what helps or hurts your recovery. |
+| 32.2 | Ground report. One button writes the message to Earth. |
+| 37.0 | You are set. |
+
 ## What comes next
 
 - Planned self-experiments: the app proposes, for example, five days with and five days without late caffeine, then compares. Testing one planned change instead of 70 comparisons lets it confirm weaker effects than observation alone can.
