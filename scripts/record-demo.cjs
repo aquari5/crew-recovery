@@ -1,11 +1,14 @@
-// Records docs/demo.mp4. Not part of the app: run the dev server on port 5183,
-// then in a scratch folder `npm i playwright-core ffmpeg-static` and
-// `node record-demo.cjs out.mp4` (uses the installed Google Chrome).
+// Records the two films: the 30-second demo (docs/demo.mp4) and the in-app
+// walk-through (public/tour.mp4). Not part of the app. Run the dev server on
+// port 5183, then in a scratch folder `npm i playwright-core ffmpeg-static` and
+//   node record-demo.cjs demo out.mp4
+//   node record-demo.cjs tour out.mp4
+// (uses the installed Google Chrome).
 //
-// Demo film. The real app runs in a window on a dark stage; a
-// camera zooms into it, a drawn cursor clicks, captions animate word by word.
-// Everything is slowed down SLOW times while frames are grabbed, then played
-// back at normal speed, so the result is smooth at any resolution.
+// The real app runs in a window on a dark stage; a camera zooms into it, a
+// drawn cursor clicks, captions animate word by word. Everything is slowed down
+// SLOW times while frames are grabbed, then played back at normal speed, so the
+// result is smooth at any resolution.
 const { chromium } = require('playwright-core')
 const ffmpeg = require('ffmpeg-static')
 const fs = require('fs')
@@ -13,11 +16,11 @@ const path = require('path')
 const { execFileSync } = require('child_process')
 
 const APP = 'http://localhost:5183'
-const OUT = process.argv[2] || path.join(__dirname, 'demo2.mp4')
-const FRAMES = path.join(__dirname, 'frames2')
-const SLOW = Number(process.env.SLOW || 5)
-const DSF = Number(process.env.DSF || 2)
-const END = 29.6
+const FILM = process.argv[2] === 'tour' ? 'tour' : 'demo'
+const OUT = process.argv[3] || path.join(process.cwd(), `${FILM}.mp4`)
+const FRAMES = path.join(process.cwd(), `frames-${FILM}`)
+const SLOW = Number(process.env.SLOW || 6)
+const END = FILM === 'tour' ? 38.4 : 29.6
 
 const STAGE = `<!doctype html><html><head><meta charset="utf-8"><style>
 @font-face{font-family:G;src:url(/node_modules/@fontsource-variable/geist/files/geist-latin-wght-normal.woff2) format('woff2');font-weight:100 900}
@@ -32,22 +35,22 @@ html,body{width:1920px;height:1080px;overflow:hidden;background:#04070e;font-fam
   box-shadow:0 0 0 1px rgba(255,255,255,.10),0 50px 140px rgba(0,0,0,.65),0 0 120px rgba(50,100,255,.18);background:#f3f5f8}
 #win iframe{width:1280px;height:720px;border:0;display:block}
 #scrim{position:fixed;left:0;right:0;bottom:0;height:300px;background:linear-gradient(180deg,rgba(4,7,14,0),rgba(4,7,14,.86) 52%,#04070e);pointer-events:none}
-#cap{position:fixed;left:0;right:0;bottom:64px;text-align:center;font-weight:600;font-size:54px;line-height:1.12;letter-spacing:-.035em;padding:0 160px;text-wrap:balance;pointer-events:none}
-#cap .w,#card .w{display:inline-block;white-space:pre;opacity:0;transform:translateY(22px);filter:blur(8px);animation:rise .5s cubic-bezier(.23,1,.32,1) forwards}
-#cap.out .w{animation:fall .22s ease-in forwards}
+#cap{position:fixed;left:0;right:0;bottom:64px;height:0;pointer-events:none}
+#cap .line{position:absolute;left:0;right:0;bottom:0;text-align:center;font-weight:600;font-size:54px;line-height:1.12;letter-spacing:-.035em;padding:0 160px;text-wrap:balance;
+  transition:opacity .45s ease,transform .45s cubic-bezier(.4,0,.2,1),filter .45s ease}
+#cap .line.leave{opacity:0;transform:translateY(-14px);filter:blur(8px)}
+#cap .w,#card .w{display:inline-block;white-space:pre;opacity:0;transform:translateY(16px);filter:blur(7px);animation:rise .8s cubic-bezier(.16,1,.3,1) forwards}
 .hi{background:linear-gradient(90deg,#8fb4ff,#a8f3ff);-webkit-background-clip:text;background-clip:text;color:transparent}
 @keyframes rise{to{opacity:1;transform:none;filter:none}}
-@keyframes fall{from{opacity:1;transform:none;filter:none}to{opacity:0;transform:translateY(-10px);filter:blur(6px)}}
 #card{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;text-align:center;pointer-events:none;transition:opacity .35s ease}
 #card .big{font-weight:600;font-size:104px;line-height:1.02;letter-spacing:-.045em;max-width:1500px;text-wrap:balance}
 #card .mark{font-family:GM,monospace;font-size:24px;letter-spacing:.42em;font-weight:600;color:rgba(255,255,255,.72)}
 #card .sub{font-size:34px;letter-spacing:-.02em;color:rgba(255,255,255,.66);font-weight:450}
 #card .url{font-family:GM,monospace;font-size:20px;letter-spacing:.06em;color:rgba(255,255,255,.5)}
-#cur{position:fixed;left:0;top:0;width:44px;height:44px;margin:-4px 0 0 -6px;pointer-events:none;opacity:0;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45));transform-origin:8px 6px}
+#cur{position:fixed;left:0;top:0;width:44px;height:44px;margin:-4px 0 0 -6px;pointer-events:none;opacity:0;transition:opacity .35s ease;will-change:transform;filter:drop-shadow(0 6px 10px rgba(0,0,0,.45));transform-origin:8px 6px}
 #rip{position:fixed;left:0;top:0;width:70px;height:70px;margin:-35px 0 0 -35px;border-radius:50%;border:3px solid rgba(255,255,255,.95);box-shadow:0 0 0 2px rgba(60,110,255,.6);opacity:0;pointer-events:none}
 #rip.go{animation:rip .55s cubic-bezier(.23,1,.32,1)}
 @keyframes rip{from{opacity:.95;transform:translate(var(--x),var(--y)) scale(.25)}to{opacity:0;transform:translate(var(--x),var(--y)) scale(1.25)}}
-#wm{position:fixed;right:28px;bottom:18px;font-family:GM,monospace;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.42)}
 </style></head><body>
 <div id="bg"></div>
 <div id="win"><iframe src="/"></iframe></div>
@@ -56,7 +59,6 @@ html,body{width:1920px;height:1080px;overflow:hidden;background:#04070e;font-fam
 <div id="rip"></div>
 <div id="card"></div>
 <div id="cap"></div>
-<div id="wm">Live capture of the app · edited with AI assistance</div>
 <script>
 const $ = (id) => document.getElementById(id)
 const ease = (t) => (t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2)
@@ -68,60 +70,74 @@ function tween(ms, fn, e = ease) {
     requestAnimationFrame(tick)
   })
 }
-const words = (text, step = 55) => {
+const words = (text, step = 42, start = 0) => {
   let i = 0
   return text.split(/(\\*[^*]+\\*|\\n)/).map((part) => {
     if (part === '\\n') return '<br>'
     const hi = part.startsWith('*')
     return (hi ? part.slice(1, -1) : part).split(/(?<= )/).filter(Boolean)
-      .map((w) => '<span class="w' + (hi ? ' hi' : '') + '" style="animation-delay:' + (i++ * step) + 'ms">' + w + '</span>').join('')
+      .map((w) => '<span class="w' + (hi ? ' hi' : '') + '" style="animation-delay:' + (start + i++ * step) + 'ms">' + w + '</span>').join('')
   }).join('')
 }
 const S = window.S = {
   cx: 960, cy: 440,
   camState: { x: 640, y: 360, s: 1.16 },
+  now: { x: 640, y: 360, s: 1.16, lift: 0 },
   apply(c, opacity, lift = 0) {
     const w = $('win')
+    S.now = { ...c, lift }
     w.style.transform = 'translate(' + (S.cx - c.x*c.s) + 'px,' + (S.cy - c.y*c.s + lift) + 'px) scale(' + c.s + ')'
     if (opacity != null) w.style.opacity = opacity
+    S.drawCursor()
   },
   cam(x, y, s, ms = 900) {
-    const a = { ...S.camState }, b = { x, y, s }
+    const a = { ...S.now }, b = { x, y, s }
     S.camState = b
     return tween(ms, (t) => S.apply({ x: a.x + (b.x-a.x)*t, y: a.y + (b.y-a.y)*t, s: a.s + (b.s-a.s)*t }))
   },
   winIn(ms = 1000) { const c = S.camState; return tween(ms, (t) => S.apply({ ...c, s: c.s*(.9 + .1*t) }, t, 90*(1-t)), out) },
   winOut(ms = 600) { const c = S.camState; return tween(ms, (t) => S.apply({ ...c, s: c.s*(1 - .08*t) }, 1 - t, 40*t)) },
+  // Captions cross over: the old line drifts up and out while the new one rises word by word.
   cap(text) {
     const el = $('cap')
-    if (!el.innerHTML) { el.className = ''; el.innerHTML = text ? words(text) : ''; return }
-    el.className = 'out'
-    setTimeout(() => { el.className = ''; el.innerHTML = text ? words(text) : '' }, 200)
+    const had = el.children.length > 0
+    for (const old of el.children) { old.classList.add('leave'); setTimeout(() => old.remove(), 520) }
+    if (!text) return
+    const line = document.createElement('div')
+    line.className = 'line'
+    line.innerHTML = words(text, 42, had ? 260 : 0)
+    el.append(line)
   },
   card(html) {
     const el = $('card')
     if (!html) { el.style.opacity = 0; return }
-    el.innerHTML = html.replace(/\\{\\{(.*?)\\}\\}/gs, (_, t) => words(t, 70))
+    el.innerHTML = html.replace(/\\{\\{(.*?)\\}\\}/gs, (_, t) => words(t, 60))
     el.style.opacity = 1
   },
-  pos: { x: 1250, y: 760 },
-  place(x, y) { S.pos = { x, y }; $('cur').style.transform = 'translate(' + x + 'px,' + y + 'px)' },
-  cursor(x, y, ms = 650) {
-    const a = { ...S.pos }
-    $('cur').style.opacity = 1
-    const bend = Math.min(60, Math.hypot(x-a.x, y-a.y)*.12)
-    return tween(ms, (t) => { const arc = Math.sin(t*Math.PI)*bend; S.place(a.x + (x-a.x)*t, a.y + (y-a.y)*t - arc) })
+  // The cursor lives in the app's own coordinates, so it stays on the content while the camera moves.
+  pos: { x: 900, y: 520 },
+  drawCursor() {
+    const c = S.now
+    $('cur').style.transform = 'translate(' + (S.cx - c.x*c.s + S.pos.x*c.s) + 'px,' + (S.cy - c.y*c.s + c.lift + S.pos.y*c.s) + 'px)'
   },
+  showCursor(x, y) { if (x != null) S.pos = { x, y }; S.drawCursor(); $('cur').style.opacity = 1 },
   hideCursor() { $('cur').style.opacity = 0 },
+  cursor(x, y, ms) {
+    const a = { ...S.pos }
+    const dist = Math.hypot(x - a.x, y - a.y)
+    const dur = ms ?? Math.max(450, Math.min(1000, 300 + dist * 1.1))
+    const bend = Math.min(26, dist * .06)
+    $('cur').style.opacity = 1
+    return tween(dur, (t) => { S.pos = { x: a.x + (x-a.x)*t, y: a.y + (y-a.y)*t - Math.sin(t*Math.PI)*bend }; S.drawCursor() }, (t) => (t < .5 ? 16*t*t*t*t*t : 1 - Math.pow(-2*t+2, 5)/2))
+  },
   click() {
-    const r = $('rip'), c = $('cur')
-    r.style.setProperty('--x', S.pos.x + 'px'); r.style.setProperty('--y', S.pos.y + 'px')
+    const r = $('rip'), c = $('cur'), m = c.style.transform.match(/translate\\(([-\\d.]+)px,\\s*([-\\d.]+)px\\)/)
+    r.style.setProperty('--x', m[1] + 'px'); r.style.setProperty('--y', m[2] + 'px')
     r.classList.remove('go'); void r.offsetWidth; r.classList.add('go')
-    c.animate([{ scale: 1 }, { scale: .82 }, { scale: 1 }], { duration: 260, easing: 'ease-out' })
+    c.animate([{ scale: 1 }, { scale: .8 }, { scale: 1 }], { duration: 300, easing: 'ease-out' })
   },
 }
 S.apply(S.camState, 0)
-S.place(S.pos.x, S.pos.y)
 </script></body></html>`
 
 // Slows every JavaScript clock in the page; CSS animations are slowed through DevTools.
@@ -139,9 +155,11 @@ const real = (ms) => new Promise((r) => setTimeout(r, ms))
   fs.rmSync(FRAMES, { recursive: true, force: true })
   fs.mkdirSync(FRAMES)
   const browser = await chromium.launch({ channel: 'chrome', headless: true, args: ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist', '--hide-scrollbars'] })
-  const page = await browser.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: DSF })
+  const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } })
   page.setDefaultTimeout(8000)
   await page.addInitScript(SLOW_CLOCK)
+  // Keep the first-visit guide closed while filming.
+  await page.addInitScript(() => { try { localStorage.setItem('crew-recovery:guide-seen:v1', '1') } catch {} })
   await page.route(`${APP}/__stage`, (route) => route.fulfill({ contentType: 'text/html', body: STAGE }))
   await page.goto(`${APP}/__stage`)
   const app = page.frames().find((f) => f !== page.mainFrame()) || (await page.waitForEvent('frameattached'))
@@ -190,18 +208,34 @@ const real = (ms) => new Promise((r) => setTimeout(r, ms))
       },
       [selector, ms, offset],
     )
-  const click = async (locator, ms = 600) => {
-    // Position inside the app, mapped through the camera transform of the window.
+  const scrollY = (y, ms) =>
+    app.evaluate(
+      ([target, dur]) => {
+        const scroller = document.scrollingElement
+        const start = scroller.scrollTop
+        const t0 = performance.now()
+        return new Promise((done) => {
+          const tick = (now) => {
+            const t = Math.min(1, (now - t0) / dur)
+            scroller.scrollTop = start + (target - start) * (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2)
+            t < 1 ? requestAnimationFrame(tick) : done()
+          }
+          requestAnimationFrame(tick)
+        })
+      },
+      [y, ms],
+    )
+  /** Move the drawn cursor to an element of the app, then click it. */
+  const click = async (locator, ms) => {
     const r = await locator.evaluate((el) => { const b = el.getBoundingClientRect(); return { x: b.x + b.width / 2, y: b.y + b.height / 2 } })
-    const c = await page.evaluate(() => ({ ...window.S.camState, cx: window.S.cx, cy: window.S.cy }))
-    const x = c.cx - c.x * c.s + r.x * c.s
-    const y = c.cy - c.y * c.s + r.y * c.s
-    await S('cursor', x, y, ms)
+    await S('cursor', r.x, r.y, ms ?? null)
     await S('click')
+    await real(90 * SLOW)
     await locator.dispatchEvent('click')
   }
+  const tab = (name) => app.getByRole('tab', { name })
 
-  await setDay(30)
+  await setDay(FILM === 'tour' ? 120 : 30)
   await real(1500)
 
   // ── Frame grabber ────────────────────────────────────────────────────────
@@ -222,82 +256,160 @@ const real = (ms) => new Promise((r) => setTimeout(r, ms))
   const at = (sec) => real(Math.max(0, (sec - clock()) * 1000 * SLOW))
   const bg = (p) => p.catch((e) => console.error('step failed:', e.message))
 
-  // 0.0  Cold open
-  await S('card', '<div class="big">{{On the way to Mars,\na doctor is *20 minutes* away.}}</div>')
-  await at(2.7)
-  await S('card', null)
-  await at(3.0)
+  if (FILM === 'demo') {
+    // 0.0  Cold open
+    await S('card', '<div class="mark">TEAM EZ AQLIMCZAK</div><div class="big">{{On the way to Mars,\na doctor is *20 minutes* away.}}</div>')
+    await at(2.7)
+    await S('card', null)
+    await at(3.0)
 
-  // 3.0  The product
-  bg(S('winIn', 1000))
-  await S('cap', '*Crew Recovery.* Health autonomy for deep space.')
-  await at(5.6)
+    // 3.0  The product
+    bg(S('winIn', 1000))
+    await S('cap', '*Crew Recovery.* Health autonomy for deep space.')
+    await at(5.6)
 
-  // 5.6  One answer
-  bg(S('cam', 500, 250, 1.5, 1000))
-  await S('cap', 'Every morning, one answer:\n*am I fit for today?*')
-  await at(8.3)
+    // 5.6  One answer
+    bg(S('cam', 500, 250, 1.5, 1100))
+    await S('cap', 'Every morning, one answer:\n*am I fit for today?*')
+    await at(8.3)
 
-  // 8.3  Sleep debt, then fever
-  bg(S('cam', 640, 360, 1.16, 800))
-  await S('cap', 'It catches *sleep debt* building…')
-  await at(8.7)
-  await scrub(44, 0.9)
-  await at(10.7)
-  await S('cap', '…and the *fever* that follows.')
-  await scrub(47, 0.4)
-  await at(11.5)
-  bg(S('cam', 520, 400, 1.42, 900))
-  bg(scrollTo('.action-cards', 900, 150))
-  await at(13.5)
+    // 8.3  Sleep debt, then fever
+    bg(S('cam', 640, 360, 1.16, 900))
+    await S('cap', 'It catches *sleep debt* building…')
+    await at(8.8)
+    await scrub(44, 0.9)
+    await at(10.7)
+    await S('cap', '…and the *fever* that follows.')
+    await scrub(47, 0.4)
+    await at(11.5)
+    bg(S('cam', 520, 400, 1.42, 1000))
+    bg(scrollTo('.action-cards', 1000, 150))
+    await at(13.5)
 
-  // 13.5  Solar storm and the report home
-  bg(scrollTo(null, 500))
-  bg(S('cam', 640, 360, 1.16, 700))
-  await S('cap', 'Solar storm: *what to do, and who to tell.*')
-  await scrub(78, 0.8)
-  await at(15.5)
-  await click(app.getByRole('button', { name: 'Ground report' }), 600)
-  await at(16.4)
-  bg(S('cam', 640, 350, 1.36, 900))
-  await S('cap', 'One complete report to Earth.\n*Every question costs 40 minutes.*')
-  await at(18.7)
+    // 13.5  Solar storm and the report home
+    bg(scrollTo(null, 600))
+    bg(S('cam', 640, 360, 1.16, 800))
+    await S('cap', 'Solar storm: *what to do, and who to tell.*')
+    await scrub(78, 0.8)
+    await at(15.3)
+    await S('showCursor', 640, 470)
+    await click(app.getByRole('button', { name: 'Ground report' }))
+    await at(16.4)
+    bg(S('cam', 640, 350, 1.36, 1000))
+    await S('cap', 'One complete report to Earth.\n*Every question costs 40 minutes.*')
+    await at(18.6)
 
-  // 18.7  Body
-  await click(app.getByRole('button', { name: 'Close report' }), 400)
-  bg(S('cam', 640, 360, 1.16, 500))
-  await click(app.getByRole('tab', { name: 'Body' }), 500)
-  await S('cap', 'Every signal *explains itself.*')
-  await at(19.9)
-  bg(S('cam', 330, 330, 1.75, 1000))
-  await at(20.9)
-  await click(app.locator('.hotspot[aria-label^="Heart"] .hit'), 500)
-  await at(21.4)
-  bg(S('cam', 760, 380, 1.4, 900))
-  await at(22.5)
+    // 18.6  Body
+    await click(app.getByRole('button', { name: 'Close report' }))
+    bg(S('cam', 640, 360, 1.16, 700))
+    await click(tab('Body'))
+    await S('cap', 'Every signal *explains itself.*')
+    await at(20.0)
+    bg(S('cam', 330, 330, 1.75, 1100))
+    await at(20.6)
+    await click(app.locator('.hotspot[aria-label^="Heart"] .dot'))
+    await at(21.5)
+    await S('hideCursor')
+    bg(S('cam', 760, 380, 1.4, 1000))
+    await at(22.6)
 
-  // 22.5  Patterns
-  await S('hideCursor')
-  await setDay(120)
-  await app.getByRole('tab', { name: 'Trends' }).dispatchEvent('click')
-  bg(S('cam', 640, 360, 1.34, 800))
-  bg(scrollTo('#patterns-title', 900, 110))
-  await S('cap', 'It learns what helps *you* recover.\nTested against *false patterns.*')
-  await at(25.4)
+    // 22.6  Patterns
+    await setDay(120)
+    await tab('Trends').dispatchEvent('click')
+    bg(S('cam', 640, 360, 1.34, 900))
+    bg(scrollTo('#patterns-title', 1000, 110))
+    await S('cap', 'It learns what helps *you* recover.\nTested against *false patterns.*')
+    await at(25.4)
 
-  // 25.4  Outlook
-  await app.getByRole('tab', { name: 'Today' }).dispatchEvent('click')
-  bg(scrollTo('#outlook-title', 800, 150))
-  bg(S('cam', 640, 340, 1.3, 800))
-  await S('cap', 'And shows where the *slow risks* are heading.')
-  await at(27.7)
+    // 25.4  Outlook
+    await tab('Today').dispatchEvent('click')
+    bg(scrollTo('#outlook-title', 900, 150))
+    bg(S('cam', 640, 340, 1.3, 900))
+    await S('cap', 'And shows where the *slow risks* are heading.')
+    await at(27.6)
 
-  // 27.7  End card
-  await S('cap', '')
-  bg(S('winOut', 600))
-  await at(28.0)
-  await S('card', '<div class="mark">CREW RECOVERY</div><div class="big">{{No server.\n*No link to Earth* needed.}}</div><div class="url">github.com/aquari5/crew-recovery</div>')
-  await at(END + 0.2)
+    // 27.6  End card
+    await S('cap', '')
+    bg(S('winOut', 600))
+    await at(28.0)
+    await S('card', '<div class="mark">CREW RECOVERY · TEAM EZ AQLIMCZAK</div><div class="big">{{No server.\n*No link to Earth* needed.}}</div><div class="url">github.com/aquari5/crew-recovery</div>')
+    await at(END + 0.2)
+  } else {
+    // ── Walk-through shown in the app's first-visit guide ──────────────────
+    bg(S('winIn', 900))
+    await S('cap', '*Today.* Start here each morning.')
+    await at(1.4)
+    bg(S('cam', 500, 250, 1.5, 1100))
+    await at(3.8)
+    await S('cap', 'The cards say *what to do* — and who to involve.')
+    bg(S('cam', 520, 400, 1.42, 1000))
+    bg(scrollTo('.action-cards', 1000, 150))
+    await at(7.4)
+
+    await S('cap', '*Timeline.* Drag to revisit any mission day.')
+    bg(scrollTo(null, 700))
+    bg(S('cam', 640, 560, 1.5, 1000))
+    await at(8.6)
+    await scrub(78, 1.3)
+    await at(10.4)
+    await scrub(47, 0.9)
+    await at(11.8)
+    await S('cap', 'Or press *Story* for the key moments.')
+    await S('showCursor', 900, 600)
+    await click(app.getByRole('button', { name: 'Story', exact: true }))
+    bg(S('cam', 640, 360, 1.16, 900))
+    await at(14.8)
+
+    await click(app.getByRole('button', { name: 'Close mission story' }))
+    await setDay(120)
+    await click(tab('Log'))
+    await S('cap', '*Log.* Two minutes: how you feel, what you did, your measurements.')
+    bg(S('cam', 640, 360, 1.3, 900))
+    await at(16.6)
+    bg(scrollY(1150, 3000))
+    await at(19.8)
+    await S('cap', 'Blood pressure has a *guided mode.*')
+    const guided = app.getByRole('button', { name: /Guide me/ })
+    await guided.evaluate((el) => el.scrollIntoView({ block: 'center' }))
+    await click(guided)
+    await at(22.8)
+
+    await click(app.getByRole('button', { name: 'Close guided measurement' }))
+    bg(S('cam', 640, 360, 1.16, 700))
+    await click(tab('Body'))
+    await S('cap', '*Body.* Select a region to see its signals.')
+    await at(24.4)
+    bg(S('cam', 330, 330, 1.75, 1100))
+    await at(25.2)
+    await click(app.locator('.hotspot[aria-label^="Heart"] .dot'))
+    await at(26.2)
+    bg(S('cam', 760, 380, 1.4, 1000))
+    await at(27.0)
+    await click(app.locator('.body-indicator summary', { hasText: 'How to measure' }).first())
+    await at(28.6)
+
+    await S('hideCursor')
+    await tab('Trends').dispatchEvent('click')
+    bg(S('cam', 640, 360, 1.34, 900))
+    bg(scrollTo('#patterns-title', 1000, 110))
+    await S('cap', '*Trends.* See what helps or hurts your recovery.')
+    await at(32.2)
+
+    await tab('Today').dispatchEvent('click')
+    bg(S('cam', 640, 360, 1.16, 800))
+    await S('cap', '*Ground report.* One button writes the message to Earth.')
+    await at(33.0)
+    await S('showCursor', 760, 420)
+    await click(app.getByRole('button', { name: 'Ground report' }))
+    bg(S('cam', 640, 350, 1.36, 1000))
+    await at(36.6)
+    await S('hideCursor')
+    await S('cap', '')
+    bg(S('winOut', 600))
+    await at(37.0)
+    await S('card', '<div class="mark">CREW RECOVERY</div><div class="big">{{You are *set.*}}</div>')
+    await at(END + 0.2)
+  }
 
   recording = false
   await grabber
@@ -305,12 +417,9 @@ const real = (ms) => new Promise((r) => setTimeout(r, ms))
 
   const kept = stamps.filter((s) => s.at < END)
   const list = kept.map((s, i) => `file '${path.join(FRAMES, s.name)}'\nduration ${((kept[i + 1]?.at ?? END) - s.at).toFixed(5)}`).join('\n')
-  fs.writeFileSync(path.join(__dirname, 'list2.txt'), `${list}\nfile '${path.join(FRAMES, kept[kept.length - 1].name)}'\n`)
-  execFileSync(
-    ffmpeg,
-    ['-y', '-f', 'concat', '-safe', '0', '-i', path.join(__dirname, 'list2.txt'), '-vf', 'fps=60,scale=1920:1080:flags=lanczos,format=yuv420p', '-t', String(END), '-c:v', 'libx264', '-preset', 'slow', '-crf', '15', '-movflags', '+faststart', OUT],
-    { stdio: 'ignore' },
-  )
+  fs.writeFileSync(path.join(process.cwd(), `list-${FILM}.txt`), `${list}\nfile '${path.join(FRAMES, kept[kept.length - 1].name)}'\n`)
+  const encode = FILM === 'tour' ? ['-vf', 'fps=30,scale=1280:720:flags=lanczos,format=yuv420p', '-crf', '24'] : ['-vf', 'fps=60,format=yuv420p', '-crf', '15']
+  execFileSync(ffmpeg, ['-y', '-f', 'concat', '-safe', '0', '-i', path.join(process.cwd(), `list-${FILM}.txt`), ...encode, '-t', String(END), '-c:v', 'libx264', '-preset', 'slow', '-movflags', '+faststart', OUT], { stdio: 'ignore' })
   console.log(`frames ${kept.length}, film fps ${(kept.length / END).toFixed(1)}, wrote ${OUT}`)
 })().catch((e) => {
   console.error(e)

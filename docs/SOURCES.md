@@ -70,7 +70,7 @@ This project is released under the MIT licence.
 - **Claude (Anthropic), via Claude Code** — also used to redesign the user interface (visual system, Today, Body, Trends, timeline).
 - **Claude (Anthropic), via Claude Code** — also used to test the correlation engine on generated data (`docs/VALIDATION.md`).
 - **Claude (Anthropic), via Claude Code** — wrote the shader that draws the 3D body figure (`src/ui/Mannequin.tsx`). The figure is computed from code; no 3D model, image or other asset was generated or downloaded.
-- **Claude (Anthropic), via Claude Code** — produced the demo video (`docs/demo.mp4`): a script drives the real application in a browser and captures the screen; the camera moves, cursor and captions are added by that script. The video carries a visible note that it was edited with AI assistance.
+- **Claude (Anthropic), via Claude Code** — produced the demo video (`docs/demo.mp4`) and the in-app walk-through (`public/tour.mp4`) with `scripts/record-demo.cjs`: the script drives the real application in a browser and captures the screen; the camera moves, cursor and captions are added by that script. No part of either video is generated imagery.
 - The application itself does not call any AI model: every number and recommendation is computed by deterministic, tested code.
 
 Update this section if that changes.

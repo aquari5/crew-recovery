@@ -51,7 +51,7 @@ button { background: none; border: 0; padding: 0; cursor: pointer; -webkit-tap-h
 button:disabled { cursor: not-allowed; opacity: 0.4; }
 a { color: inherit; text-underline-offset: 3px; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
-::selection { background: var(--ink); color: #fff; }
+::selection { background: color-mix(in srgb, var(--accent) 24%, transparent); color: inherit; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .tnum { font-variant-numeric: tabular-nums; }
 
@@ -273,6 +273,14 @@ p { line-height: 1.55; }
 
 /* ── Sheets (dialogs) ───────────────────────────────────────────────────── */
 .sheet { width: min(760px, calc(100% - 24px)); max-height: min(86dvh, 900px); margin: auto; padding: 0; border: 0; border-radius: 24px; background: var(--surface); color: var(--ink); box-shadow: 0 30px 80px -20px rgba(10, 16, 32, 0.45); overflow: auto; }
+.guide { width: min(820px, calc(100% - 24px)); }
+.guide-video { display: block; width: 100%; aspect-ratio: 16 / 9; margin-top: 18px; border-radius: 16px; background: #04070e; }
+.guide-steps { display: grid; gap: 12px; margin-top: 20px; counter-reset: step; }
+.guide-steps li { display: grid; grid-template-columns: 26px 150px 1fr; gap: 10px; align-items: baseline; counter-increment: step; font-size: 0.9375rem; line-height: 1.5; color: var(--ink-2); }
+.guide-steps li::before { content: counter(step, decimal-leading-zero); font-family: var(--mono); font-size: 0.75rem; color: var(--muted); }
+.guide-steps strong { font-weight: 600; color: var(--ink); }
+.guide-note { margin-top: 18px; font-size: 0.875rem; }
+.guide-button { font-family: var(--mono); font-size: 0.875rem; }
 .sheet-narrow { width: min(460px, calc(100% - 24px)); }
 .sheet::backdrop { background: rgba(10, 16, 32, 0.38); backdrop-filter: blur(6px); }
 /* Modals stay centred: they are not anchored to a trigger. */
@@ -511,6 +519,8 @@ details ul { display: grid; gap: 6px; font-size: 0.8125rem !important; }
   .body-legend { display: none; }
   .hotspot text, .hotspot .leader { display: none; }
   .body-figure { width: min(100%, calc(46dvh * 512 / 456)); }
+  .guide-steps li { grid-template-columns: 26px 1fr; }
+  .guide-steps li span { grid-column: 2; }
   .metric-list { display: flex; overflow-x: auto; scrollbar-width: none; padding: 6px; }
   .metric { flex: none; grid-template-columns: 8px auto auto; border: 1px solid var(--line); margin-right: 4px; }
   .signal { grid-template-columns: 22px 84px 1fr 40px; }

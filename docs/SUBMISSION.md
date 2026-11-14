@@ -68,22 +68,36 @@ See "Use of AI tools" in `docs/SOURCES.md`. Claude (Anthropic) and Codex (OpenAI
 
 ## Demo video (29.6 seconds)
 
-`docs/demo.mp4`, 1920×1080, no sound. The Project Submission Guide sets a hard limit of 30 seconds; a longer demo is not eligible for global judging. A voice-over must fit inside the same 29.6 seconds. Narration in a language other than English is allowed only because the video has English captions.
+`docs/demo.mp4`, 1920×1080, 60 fps, no sound. The Project Submission Guide sets a hard limit of 30 seconds; a longer demo is not eligible for global judging, so the voice-over has to end by 29.6 s. Team: **EZ Aqlimczak** (shown on the opening and closing cards).
 
-The guide suggests this order: who you are and your team name, the challenge, the project name and tagline, how it works, what it could become. The captions cover the last four; say the team name in the voice-over.
+### Voice-over script
 
-| Time | On screen | Caption | Suggested voice-over |
-|---|---|---|---|
-| 0.0–3.0 | Title card | On the way to Mars, a doctor is 20 minutes away. | "We are team ___. On the way to Mars, a doctor is twenty minutes away." |
-| 3.0–5.6 | App appears, day 30, green | Crew Recovery. Health autonomy for deep space. | "This is Crew Recovery." |
-| 5.6–8.3 | Zoom on headline and readiness | Every morning, one answer: am I fit for today? | "Every morning it gives an astronaut one answer." |
-| 8.3–13.5 | Timeline to day 44, then 47, action steps | It catches sleep debt building… and the fever that follows. | "It catches sleep debt building, and the fever that follows." |
-| 13.5–18.7 | Day 78, ground report | Solar storm: what to do, and who to tell. One complete report to Earth. Every question costs 40 minutes. | "In a solar storm it says what to do, and writes one complete report to Earth." |
-| 18.7–22.5 | Body map, heart | Every signal explains itself. | "Every signal explains how to measure it and why it matters." |
-| 22.5–25.4 | Trends, patterns | It learns what helps you recover. Tested against false patterns. | "It learns what helps you recover." |
-| 25.4–27.7 | Mission outlook | And shows where the slow risks are heading. | "And shows where slow risks are heading." |
-| 27.7–29.6 | End card | No server. No link to Earth needed. | "No server. No link to Earth needed." |
+About 70 words. Read calmly; each line starts at the time shown and must end before the next one.
 
-The video is a capture of the real application driven by a script; the camera moves, cursor and captions are added by the same script. It carries the visible note "Live capture of the app · edited with AI assistance", because the guide requires a visible mark on images and video made with AI tools.
+| Start | Line | On screen |
+|---|---|---|
+| 0.0 | On the way to Mars, a doctor is twenty minutes away. | Title card |
+| 3.0 | We're EZ Aqlimczak, and this is Crew Recovery. | The app appears, a calm day |
+| 5.6 | Every morning it answers one question: am I fit for today? | Headline and readiness score |
+| 8.5 | It catches sleep debt building, | Timeline moves to day 44 |
+| 10.7 | and the fever that follows. | Day 47, steps to take |
+| 13.6 | In a solar storm it says what to do, | Day 78 |
+| 16.4 | and writes one complete report to Earth. | Ground report |
+| 19.0 | Every signal explains itself. | Body map |
+| 22.8 | It learns what helps you recover, | Patterns |
+| 25.5 | and shows where slow risks are heading. | Mission outlook |
+| 27.9 | No server. No link to Earth needed. | End card |
 
-Rules from the guide to keep in mind when adding sound: no image, video or audio of a person under 18; AI-generated audio must be acknowledged in the description.
+Rules from the guide for the sound: the speaker must be 18 or older; narration in another language is allowed only with English captions (the video has them); an AI-generated voice must be acknowledged in the project description.
+
+The video is a capture of the real application driven by `scripts/record-demo.cjs`; the camera moves, cursor and captions are added by the same script. This is stated in the "Use of SI" field.
+
+## In-app guide
+
+On the first visit the app opens a "How to use" dialog with a 38-second walk-through (`public/tour.mp4`) and the same steps as text. It can be reopened with the "?" button in the header.
+
+## What comes next
+
+- Planned self-experiments: the app proposes, for example, five days with and five days without late caffeine, then compares. Testing one planned change instead of 70 comparisons lets it confirm weaker effects than observation alone can.
+- Input from real wearables and cabin sensors instead of manual entry.
+- Validation on analog-mission data (for example isolation studies), since no real astronaut data was used.

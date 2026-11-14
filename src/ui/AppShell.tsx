@@ -1,6 +1,7 @@
 import { useRef, useState, type KeyboardEvent } from 'react'
 import { ENVIRONMENTS, roundTripDelayLabel, type MissionEnvironment } from '../core'
 import Body from './screens/Body'
+import Guide, { isFirstVisit } from './Guide'
 import Crew from './screens/Crew'
 import Log from './screens/Log'
 import Today from './screens/Today'
@@ -13,6 +14,7 @@ const TABS = ['Today', 'Body', 'Trends', 'Log', 'Crew'] as const
 export default function AppShell() {
   const { mission, crewId, setCrewId, envId, setEnvId, assessment } = useMission()
   const [tab, setTab] = useState(0)
+  const [guide, setGuide] = useState(isFirstVisit)
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([])
 
   function open(index: number) {
@@ -67,6 +69,9 @@ export default function AppShell() {
             ))}
           </div>
           <div className="nav-meta">
+            <button type="button" className="icon-button guide-button" aria-label="How to use" title="How to use" onClick={() => setGuide(true)}>
+              ?
+            </button>
             <label className="pill-select">
               <span className="sr-only">Environment</span>
               <select value={envId} onChange={(event) => setEnvId(event.target.value as MissionEnvironment['id'])}>
@@ -106,6 +111,7 @@ export default function AppShell() {
         </div>
       </main>
 
+      <Guide open={guide} onClose={() => setGuide(false)} />
       <Timeline onOpenToday={() => setTab(0)} />
     </div>
   )
