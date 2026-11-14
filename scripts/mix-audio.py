@@ -3,6 +3,7 @@
 #   python3 scripts/mix-audio.py demo silent-demo.mp4 docs/demo.mp4 [music file]
 #   python3 scripts/mix-audio.py tour silent-tour.mp4 public/tour.mp4 [music file]
 # The chunk times were read off the recordings in docs/voice/ with ffmpeg's silencedetect.
+# The music file is not kept in this repository: its licence covers use in a video, not redistribution.
 import subprocess, sys, os
 film, video, out = sys.argv[1], sys.argv[2], sys.argv[3]
 music = sys.argv[4] if len(sys.argv) > 4 else None
@@ -22,8 +23,13 @@ flt = ';'.join(parts) + ';' + ''.join(labels) + f"amix=inputs={len(CHUNKS)}:norm
 inputs = ['-i', video, '-i', f'docs/voice/{film}.mp3']
 final = '[voice]'
 if music:
-    inputs += ['-stream_loop', '-1', '-i', music]
+    # Where the track starts, chosen so its main section comes in as the app appears on screen
+    # (the section begins 22.5 s into "Spirit Molecule"; the app appears at 3.5 s in the demo and at once in the tour).
+    start = {'demo': 19.0, 'tour': 22.1}[film]
+    inputs += ['-ss', str(start), '-i', music]
     # Music sits well under the voice, dips further while someone speaks, and fades at both ends.
-    flt += f";[2:a]atrim=0:{END},afade=t=in:d=1.2,afade=t=out:st={END-2.0}:d=2.0,volume=0.22[bed];[voice]asplit[v1][v2];[bed][v2]sidechaincompress=threshold=0.02:ratio=6:attack=40:release=500[duck];[v1][duck]amix=inputs=2:normalize=0,alimiter=limit=0.9[mix]"
+    flt += (f";[2:a]atrim=0:{END},asetpts=PTS-STARTPTS,afade=t=in:d=0.5,afade=t=out:st={END-2.2}:d=2.2,volume=0.26,aformat=channel_layouts=stereo[bed]"
+            f";[voice]aformat=channel_layouts=stereo,asplit[v1][v2];[bed][v2]sidechaincompress=threshold=0.03:ratio=4:attack=30:release=450[duck]"
+            f";[v1][duck]amix=inputs=2:normalize=0,alimiter=limit=0.9[mix]")
     final = '[mix]'
 subprocess.check_call([ff,'-y','-loglevel','error',*inputs,'-filter_complex',flt,'-map','0:v','-map',final,'-c:v','copy','-c:a','aac','-ar','48000','-b:a','192k','-t',str(END),'-movflags','+faststart',out])
