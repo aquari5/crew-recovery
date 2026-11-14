@@ -57,21 +57,33 @@ It is a prototype for demonstration and education, not a medical device. Thresho
 
 See `docs/SOURCES.md` for the full list: NASA Human Research Program hazards, risks and research pages; NASA-STD-3001; NASA OCHMO technical briefs on carbon dioxide and radiation protection; Canadian Space Agency resources on radiation monitoring.
 
-## Use of AI
+## Use of Super Intelligence (SI) tools
 
 See "Use of AI tools" in `docs/SOURCES.md`. Claude (Anthropic) and Codex (OpenAI) were used as coding assistants during the hackathon. The application itself does not call any AI model.
 
-## Demo script (30 seconds)
+## Links for the form
 
-A recorded version with captions is in `docs/demo.mp4` (1920×1080, 30 s, no sound).
+- **Link to Final Project:** https://aquari5.github.io/crew-recovery/ (live app) · source: https://github.com/aquari5/crew-recovery
+- **Link to Project Demo:** `docs/demo.mp4` in the repository. The guide asks for a public link that needs no login; upload the file to YouTube (unlisted or public) or use the GitHub file link, and test it in a private window.
 
-| Time | Screen | Narration |
-|---|---|---|
-| 0–4 s | Today, day 30, green | "On the way to Mars a doctor is 20 minutes away. Crew Recovery tells an astronaut how they are, every morning." |
-| 4–10 s | Story → day 44, then 47 | "A week of shifted schedules builds sleep debt. Three days later: a fever. The tool says what to do and who to tell." |
-| 10–15 s | Day 78, dark level-3 card, Ground report | "A solar storm. Shelter now — and one complete report for the flight surgeon, because every question costs 40 minutes." |
-| 15–20 s | Body map, tap heart, open "How to measure" | "Every signal explains itself: how to measure it, why it matters in space, where the threshold comes from." |
-| 20–25 s | Trends → patterns | "It learns from your own data what helps you recover and what does not." |
-| 25–30 s | Today → Mission outlook | "And it shows where the slow risks are heading. No server, no link to Earth needed." |
+## Demo video (29.6 seconds)
 
-Recording tips: use the timeline's Story button to jump between the days, record at 1280×720 or larger, and keep the cursor still while narrating.
+`docs/demo.mp4`, 1920×1080, no sound. The Project Submission Guide sets a hard limit of 30 seconds; a longer demo is not eligible for global judging. A voice-over must fit inside the same 29.6 seconds. Narration in a language other than English is allowed only because the video has English captions.
+
+The guide suggests this order: who you are and your team name, the challenge, the project name and tagline, how it works, what it could become. The captions cover the last four; say the team name in the voice-over.
+
+| Time | On screen | Caption | Suggested voice-over |
+|---|---|---|---|
+| 0.0–3.0 | Title card | On the way to Mars, a doctor is 20 minutes away. | "We are team ___. On the way to Mars, a doctor is twenty minutes away." |
+| 3.0–5.6 | App appears, day 30, green | Crew Recovery. Health autonomy for deep space. | "This is Crew Recovery." |
+| 5.6–8.3 | Zoom on headline and readiness | Every morning, one answer: am I fit for today? | "Every morning it gives an astronaut one answer." |
+| 8.3–13.5 | Timeline to day 44, then 47, action steps | It catches sleep debt building… and the fever that follows. | "It catches sleep debt building, and the fever that follows." |
+| 13.5–18.7 | Day 78, ground report | Solar storm: what to do, and who to tell. One complete report to Earth. Every question costs 40 minutes. | "In a solar storm it says what to do, and writes one complete report to Earth." |
+| 18.7–22.5 | Body map, heart | Every signal explains itself. | "Every signal explains how to measure it and why it matters." |
+| 22.5–25.4 | Trends, patterns | It learns what helps you recover. Tested against false patterns. | "It learns what helps you recover." |
+| 25.4–27.7 | Mission outlook | And shows where the slow risks are heading. | "And shows where slow risks are heading." |
+| 27.7–29.6 | End card | No server. No link to Earth needed. | "No server. No link to Earth needed." |
+
+The video is a capture of the real application driven by a script; the camera moves, cursor and captions are added by the same script. It carries the visible note "Live capture of the app · edited with AI assistance", because the guide requires a visible mark on images and video made with AI tools.
+
+Rules from the guide to keep in mind when adding sound: no image, video or audio of a person under 18; AI-generated audio must be acknowledged in the description.

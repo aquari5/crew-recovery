@@ -13,6 +13,8 @@ Health monitoring tool for astronauts on long-duration missions: daily journal +
 - **Explains itself.** Every indicator says how to measure it, why it matters in space and which source the thresholds come from.
 - **Works with no link to Earth.** No backend: everything runs and is stored in the browser.
 
+**Live app:** https://aquari5.github.io/crew-recovery/ · **Demo video:** [docs/demo.mp4](docs/demo.mp4)
+
 The demo runs on a synthetic 120-day Mars transit with a crew of four. No real astronaut data is used.
 
 ## Run it
