@@ -91,12 +91,7 @@ This project is released under the MIT licence.
 
 ## Use of AI tools
 
-- **Claude (Anthropic), via Claude Code** — used during the hackathon to design and write the health logic in `src/core/` (data model, thresholds, baseline, readiness score, escalation rules, correlation engine, synthetic mission data), its tests, and the project documentation, under the direction and review of a team member.
-- **Codex (OpenAI)** — used during the hackathon to write the first version of the user interface in `src/ui/` from written briefs, under the direction and review of a team member. Its form, chart-scale and crew-sorting helpers remain in use.
-- **Claude (Anthropic), via Claude Code** — also used to redesign the user interface (visual system, Today, Body, Trends, timeline).
-- **Claude (Anthropic), via Claude Code** — also used to test the correlation engine on generated data (`docs/VALIDATION.md`).
-- **Claude (Anthropic), via Claude Code** — wrote the shader that draws the 3D body figure (`src/ui/Mannequin.tsx`). The figure is computed from code; no 3D model, image or other asset was generated or downloaded.
-- **Claude (Anthropic), via Claude Code** — produced the demo video (`docs/demo.mp4`) and the in-app walk-through (`public/tour.mp4`) with `scripts/record-demo.cjs`: the script drives the real application in a browser and captures the screen; the camera moves, cursor and captions are added by that script. No part of either video is generated imagery.
+- **Code:** written with Claude Code (Anthropic), under the direction and review of the team. An early draft of some interface code was written with Codex (OpenAI).
+- **Voice-over:** a recorded voice modulated with ElevenLabs, used in `docs/demo.mp4` and `public/tour.mp4`. This is also stated in the metadata of both video files and of the recordings in `docs/voice/`.
+- **Videos:** captures of the real application; no part of the picture is generated imagery.
 - The application itself does not call any AI model: every number and recommendation is computed by deterministic, tested code.
-
-Update this section if that changes.

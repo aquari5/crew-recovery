@@ -81,7 +81,7 @@ Full list with links and licences: `docs/SOURCES.md`.
 
 ## Use of Super Intelligence (SI)
 
-Yes. Claude (Anthropic), through Claude Code, was used as a coding assistant during the hackathon to write the health logic, its tests, the user interface, the shader that draws the 3D body figure, the documentation, and the script that records the demo video from the running application. Codex (OpenAI) wrote an early version of the user interface; some of its form and list code is still in use. The team chose the challenge, set the direction, made the design and scope decisions and reviewed the results. The application itself does not call any AI model: every number and recommendation is computed by deterministic, tested code. No images, audio or video were produced by a generative model. Details: "Use of AI tools" in `docs/SOURCES.md`.
+Yes. The project's code was written with Claude Code (Anthropic), under the direction and review of the team; an early draft of some interface code was written with Codex (OpenAI). The voice-over in the demo video and in the in-app guide is a recorded voice modulated with ElevenLabs. The videos are captures of the real application and contain no generated imagery. The application itself does not call any AI model: every number and recommendation is computed by deterministic, tested code.
 
 ## Links for the form
 
@@ -107,7 +107,7 @@ The recorded voice is in `docs/voice/demo.mp3`. The film's scenes were retimed t
 | 22.2 | It learns what helps you recover, and shows where slow risks are heading. | Patterns, mission outlook |
 | 26.5 | No server. No link to Earth needed. | End card |
 
-Rules from the guide for the sound: the speaker must be 18 or older; narration in another language is allowed only with English captions (the video has them); an AI-generated voice must be acknowledged in the project description.
+The voice was modulated with ElevenLabs; this is acknowledged in the "Use of SI" field and in the video file's metadata, as the guide requires for audio.
 
 The video is a capture of the real application driven by `scripts/record-demo.cjs`; the camera moves, cursor and captions are added by the same script. This is stated in the "Use of SI" field.
 
