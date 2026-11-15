@@ -104,7 +104,7 @@ The recorded voice is in `docs/voice/demo.mp3`. The film's scenes were retimed t
 | 3.7 | We're EZ Aqlimczak, and this is Crew Recovery. | The app appears, a calm day |
 | 7.2 | Every morning it answers one question: am I fit for today? | Headline and readiness score |
 | 11.2 | It catches sleep debt building, and the fever that follows. | Days 44 and 47, steps to take |
-| 14.8 | In a solar storm it says what to do, and writes one complete report to Earth. | Day 78, ground report |
+| 14.8 | In a solar storm it says what to do, and writes one complete report to Earth. | Replay of the 10 September 2017 storm from NASA DONKI records, then the ground report |
 | 19.6 | Every signal explains itself. | Body map |
 | 22.2 | It learns what helps you recover, and shows where slow risks are heading. | Patterns, mission outlook |
 | 26.5 | No server. No link to Earth needed. | End card |

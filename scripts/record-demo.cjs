@@ -187,6 +187,13 @@ const real = (ms) => new Promise((r) => setTimeout(r, ms))
     }, d)
     day = d
   }
+  /** Move the space weather replay to a minute of the storm. */
+  const setReplay = (minute) =>
+    app.evaluate((x) => {
+      const input = document.querySelector('.sw-scrub input')
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(input, String(x))
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+    }, minute)
   const scrub = async (to, sec) => {
     const from = day
     const steps = Math.abs(to - from)
@@ -293,16 +300,22 @@ const real = (ms) => new Promise((r) => setTimeout(r, ms))
     bg(scrollTo('.action-cards', 900, 150))
     await at(14.6)
 
-    // 14.6  Solar storm and the report home
-    bg(scrollTo(null, 500))
-    bg(S('cam', 640, 360, 1.16, 700))
-    await S('cap', 'Solar storm: *what to do, and who to tell.*')
-    await scrub(78, 0.7)
-    await at(16.2)
-    await S('showCursor', 640, 470)
-    await click(app.getByRole('button', { name: 'Ground report' }), 650)
-    await at(17.1)
-    bg(S('cam', 640, 350, 1.36, 900))
+    // 14.6  A real solar storm from NASA's records, then the report home
+    await app.locator('.sw-mode').nth(1).dispatchEvent('click')
+    await setReplay(50)
+    bg(scrollTo('#weather-title', 800, 96))
+    bg(S('cam', 640, 380, 1.3, 800))
+    await S('cap', 'A real solar storm, from *NASA data:*\n*50 minutes* of warning.')
+    await at(15.5)
+    for (let minute = 55; minute <= 125; minute += 5) {
+      await setReplay(minute)
+      await real(95 * SLOW)
+    }
+    await at(17.0)
+    await setDay(78)
+    await scrollTo(null, 1)
+    await app.getByRole('button', { name: 'Ground report' }).dispatchEvent('click')
+    bg(S('cam', 640, 350, 1.36, 800))
     await S('cap', 'One complete report to Earth.\n*Every question costs 40 minutes.*')
     await at(19.4)
 
