@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { buildGroundReport, roundTripDelayLabel } from '../core'
+import { buildGroundReport, crewSignals, roundTripDelayLabel, withEntries } from '../core'
 import { useMission } from './state'
 
 /** Shows the generated ground report and lets the crew copy or save it. */
@@ -9,7 +9,15 @@ export default function ReportDialog({ open, onClose }: { open: boolean; onClose
   const [copied, setCopied] = useState(false)
   const crew = mission.crew.find((member) => member.id === crewId)!
   const report = useMemo(
-    () => buildGroundReport({ crew, missionName: mission.name, env: mission.env, records, assessment }),
+    () =>
+      buildGroundReport({
+        crew,
+        missionName: mission.name,
+        env: mission.env,
+        records,
+        assessment,
+        crewSignals: crewSignals(mission.crew, Object.fromEntries(mission.crew.map((member) => [member.id, withEntries(member.id, mission.records[member.id])])), assessment.day, mission.env),
+      }),
     [crew, mission, records, assessment],
   )
 

@@ -102,3 +102,11 @@ Entries are stored in `localStorage` and merged by `withEntries`. After saving, 
 ## Timing convention
 
 `sleep`, `restingHR`, `hrv` on day N describe the night that ended on the morning of day N. The journal on day N describes what happened during day N.
+
+## Crew-wide signals
+
+`crewSignals(crew, recordsByCrewId, day, env)` returns what at least two people, and at least half of those with data, share on that day: out-of-range indicators and reported symptoms, each with `title`, `why`, `actions` and the names in `affected`. Pass the result to `buildGroundReport({ ..., crewSignals })` to include the shared ones in a person's report.
+
+## Space weather
+
+`parseDonki(records)` turns NASA DONKI SEP records into events; `spaceWeatherAt(events, timeMs)` gives the status and advice at a moment; `warningTimes(events, env)` gives, per flare, the minutes until the first measured protons and what is left after the one-way link delay. Recorded data: `SEP_2017_09`, `SEP_2024_05`, `SNAPSHOT`.

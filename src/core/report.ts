@@ -9,6 +9,7 @@ import { JOURNAL, SYMPTOM_BY_KEY, roundTripDelayLabel } from './catalog'
 import { upTo } from './evaluate'
 import { INDICATOR_BY_ID, formatValue } from './indicators'
 import { mean } from './stats'
+import type { CrewSignal } from './crewSignals'
 import type { Assessment, CrewMember, DailyRecord, JournalKey, MissionEnvironment } from './types'
 
 export interface GroundReport {
@@ -28,6 +29,8 @@ export function buildGroundReport(input: {
   env: MissionEnvironment
   records: DailyRecord[]
   assessment: Assessment
+  /** Signals shared across the crew today; those that include this person are reported. */
+  crewSignals?: CrewSignal[]
 }): GroundReport {
   const { crew, missionName, env, records, assessment: a } = input
   const hist = upTo(records, a.day)
@@ -66,6 +69,10 @@ export function buildGroundReport(input: {
     .map((j) => ({ label: j.label.toLowerCase(), n: week.filter((r) => r.journal[j.key] === false).length }))
     .filter((f) => f.n >= 4)
   if (missing.length) add(`- Missing on 4+ of the last 7 days: ${missing.map((f) => `${f.label} (${f.n} days without)`).join(', ')}.`)
+  const sharedWithCrew = (input.crewSignals ?? []).filter((signal) => signal.affected.includes(crew.name))
+  if (sharedWithCrew.length) {
+    add(`- Shared with other crew today (a common cause is likely): ${sharedWithCrew.map((signal) => `${signal.title.toLowerCase()}`).join('; ')}.`)
+  }
   add(`- Mission radiation dose: ${a.radiation.cumulativeMsv} mSv (${Math.round(a.radiation.fractionOfLimit * 100)}% of the ${a.radiation.careerLimitMsv} mSv career limit).`)
 
   add('', 'ASSESSMENT', `${pad('Indicator', 28)}${pad('Value', 16)}${pad('Own normal', 14)}Status`)

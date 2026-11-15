@@ -7,6 +7,7 @@ import {
   evaluateIndicator,
   findFindings,
   findInsights,
+  crewSignals,
   parseDonki,
   spaceWeatherAt,
   warningTimes,
@@ -347,5 +348,42 @@ describe('space weather from NASA DONKI records', () => {
     expect(fastest.flareToProtonsMin).toBe(50)
     expect(fastest.leftAfterLinkMin).toBe(40) // 10 min one-way delay on the transit
     expect(warningTimes(may, env).some((w) => w.flareToProtonsMin === 60)).toBe(true)
+  })
+})
+
+describe('crew-wide signals', () => {
+  const mission = generateMission()
+  const on = (day: number) => crewSignals(mission.crew, mission.records, day, mission.env)
+
+  it('reports nothing on a calm day', () => {
+    expect(on(30)).toHaveLength(0)
+  })
+
+  it('ties a shared headache to the cabin air', () => {
+    const signals = on(64)
+    const co2 = signals.find((s) => s.id === 'indicator-co2')!
+    expect(co2.status).toBe('alert')
+    expect(co2.affected).toHaveLength(4)
+    const headache = signals.find((s) => s.id === 'symptom-headache')!
+    expect(headache.affected).toHaveLength(4)
+    expect(headache.actions.join(' ')).toContain('CO₂')
+  })
+
+  it('sees a failed exercise device as one cause, not four', () => {
+    const exercise = on(92).find((s) => s.id === 'indicator-exercise')!
+    expect(exercise.affected).toHaveLength(4)
+    expect(exercise.actions.join(' ')).toContain('device')
+  })
+
+  it('leaves a problem that only one person has to that person', () => {
+    // Only the mission specialist reports changed vision at the end of the mission.
+    expect(on(120).some((s) => s.id === 'symptom-visionChange')).toBe(false)
+  })
+
+  it('tells the flight surgeon what the patient shares with the crew', () => {
+    const records = mission.records.fe1
+    const report = buildGroundReport({ crew: mission.crew[0], missionName: mission.name, env: mission.env, records, assessment: assess(records, 64, mission.env), crewSignals: on(64) })
+    expect(report.body).toContain('Shared with other crew today')
+    expect(report.body).toContain('headache')
   })
 })

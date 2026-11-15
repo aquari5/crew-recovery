@@ -22,7 +22,7 @@ On the International Space Station a flight surgeon is a few seconds away. On th
 - **Body.** A 3D figure with eight regions that glows where something needs attention. Each region shows its indicators, how to take the measurement, which flight hardware measures it today, what was measured in real crews, why it matters in space, and the source of the threshold.
 - **Trends.** Every indicator over time, with the reference zones and the astronaut's own normal drawn on the chart, and the behaviours that go together with better or worse recovery in that person's own data.
 - **Log.** A daily check-in: mood, energy and stress, twelve yes/no journal items, symptoms, and measurements. Blood pressure has a guided mode with timers, because a correct reading needs five minutes of rest and two readings.
-- **Crew.** An overview for the Crew Medical Officer, most urgent person first.
+- **Crew.** An overview for the Crew Medical Officer, most urgent person first, and an answer to "is it one person, or the cabin?": when several crew members share a symptom or an out-of-range reading on the same day, the tool reports one shared cause (air, schedule, a failed device) and where to look first, and adds it to each affected person's ground report.
 - **Timeline.** Every mission day is one bar, coloured by that day's status, so the history of the mission is visible at a glance and any day can be reopened.
 - **Space weather.** Real NASA DONKI records of solar particle events, live and as replays of two real storms, with the warning time each storm gave and what is left of it after the link delay.
 - **Mission outlook.** Projections of cumulative radiation against the 600 mSv career limit, bone density put at risk by days without resistive exercise, sleep debt, and body mass at mission end.
@@ -31,7 +31,7 @@ On the International Space Station a flight surgeon is a few seconds away. On th
 
 ### How it works
 
-All health logic is deterministic TypeScript with tests (60). Nothing is computed by an AI model, so every number and recommendation can be traced to a rule and a cited threshold.
+All health logic is deterministic TypeScript with tests (65). Nothing is computed by an AI model, so every number and recommendation can be traced to a rule and a cited threshold.
 
 - A value is judged twice: against clinical reference ranges, and against the person's own 28-day baseline using a robust z-score. One unusual day is a prompt to look; sustained patterns are escalated.
 - "Not measured" is never shown as "fine". Missing data has its own state throughout.
@@ -48,6 +48,7 @@ Space weather is real NASA data. The crew's health data is synthetic: the demo u
 - It answers "what do I do and who do I tell", not only "what is my number".
 - It personalises: thresholds are checked against each astronaut's own normal, and the patterns come from their own data.
 - It is built for delay: full guidance on board, and a single complete message to the ground.
+- It looks at the crew as a system: four headaches on the same day are reported as a cabin problem, not as four patients.
 - It explains itself: every indicator carries its measurement method, its reason and its source.
 
 ### Limits

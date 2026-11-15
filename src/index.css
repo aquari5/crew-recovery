@@ -494,6 +494,12 @@ details ul { display: grid; gap: 6px; font-size: 0.8125rem !important; }
 
 /* ── Crew ───────────────────────────────────────────────────────────────── */
 .crew-note { max-width: 60ch; margin-bottom: 24px; }
+.shared { margin-bottom: 28px; }
+.shared-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.shared-card { border-left: 3px solid var(--tone); }
+.shared-card h4 { margin-top: 12px; font-size: 1.125rem; font-weight: 500; letter-spacing: -0.02em; }
+.shared-card > .muted { margin-top: 6px; font-size: 0.9375rem; }
+.shared-more { margin-top: 12px; font-size: 0.875rem; }
 .crew-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .crew-card { display: grid; gap: 4px; padding: clamp(22px, 2.6vw, 30px); text-align: left; transition: transform 200ms var(--ease-out), box-shadow 200ms ease; }
 .crew-card:active { transform: scale(0.99); }
@@ -532,7 +538,7 @@ details ul { display: grid; gap: 6px; font-size: 0.8125rem !important; }
   .action-card { grid-template-columns: minmax(0, 1fr); }
   .action-level { grid-auto-flow: column; justify-content: start; align-items: baseline; gap: 12px; }
   .action-level b { font-size: 1.5rem; }
-  .scale-grid, .journal-grid, .measurement-grid, .crew-grid, .outlook-grid, .hazard-row { grid-template-columns: minmax(0, 1fr); }
+  .scale-grid, .journal-grid, .measurement-grid, .crew-grid, .shared-grid, .outlook-grid, .hazard-row { grid-template-columns: minmax(0, 1fr); }
   .insight { grid-template-columns: minmax(0, 1fr); gap: 8px; }
   .dock-bar { grid-template-columns: 1fr auto; padding: 10px 12px; border-radius: 20px; }
   .strip { grid-column: 1 / -1; grid-row: 2; height: 30px; }
