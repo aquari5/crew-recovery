@@ -16,6 +16,7 @@ const STEPS: { title: string; text: string }[] = [
   { title: 'Timeline', text: 'Drag the strip at the bottom to revisit any mission day. Story walks through the key moments of the demo mission.' },
   { title: 'Log', text: 'Record how you feel, what you did and your measurements. Blood pressure has a guided mode with timers.' },
   { title: 'Body and Trends', text: 'Select a body region to see its signals and how to measure them. Trends shows which of your habits help or hurt your recovery.' },
+  { title: 'Space weather', text: 'On Today, real NASA records of solar particle events: live, or replay a real storm and watch the advice change as the detections arrive.' },
   { title: 'Ground report', text: 'When Earth has to be involved, one button on Today writes the complete message for the flight surgeon.' },
 ]
 

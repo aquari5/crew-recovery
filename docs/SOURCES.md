@@ -44,6 +44,14 @@ Thresholds live in `src/core/indicators.ts`. "Checked" means the value was compa
 
 Links: [NASA OCHMO-TB-004 Carbon Dioxide](https://www.nasa.gov/wp-content/uploads/2023/12/ochmo-tb-004-carbon-dioxide.pdf) · [NASA OCHMO Radiation Protection brief](https://www.nasa.gov/wp-content/uploads/2023/03/radiation-protection-technical-brief-ochmo.pdf) · [SwRI on MSL/RAD cruise dose](https://www.swri.org/newsroom/press-releases/swri-led-team-calculates-the-radiation-exposure-associated-trip-mars) · [Barger et al. press release](https://www.eurekalert.org/news-releases/595450) · [ADA hypoglycemia levels](https://professional.diabetes.org/sites/dpro/files/2025-05/hypoglycemia-hcp-5-27-25.pdf) · [2025 AHA/ACC guideline quick reference](https://www.2minutemedicine.com/guidelines/high-blood-pressure/)
 
+## Real NASA data used by the app
+
+- **NASA DONKI, solar energetic particle (SEP) events** — https://ccmc.gsfc.nasa.gov/tools/DONKI/ , API: https://api.nasa.gov/ (`/DONKI/SEP`). Operated by NASA's Community Coordinated Modeling Center.
+  - Live: the app requests the last 30 days when it is online and keeps the answer for an hour (`src/ui/SpaceWeather.tsx`).
+  - Recorded: the records for 3–13 September 2017 (9 records) and 6–16 May 2024 (14 records), and the empty answer for 1 October–15 November 2026, were fetched on 15 Nov 2026 and are stored unchanged apart from dropped fields in `src/core/data/donki.ts`.
+  - Logic and tests on these records: `src/core/spaceWeather.ts`, `src/core/core.test.ts`.
+  - Limits: the app uses NASA's public `DEMO_KEY`, which allows a few requests per hour per address; when the request fails the stored copy is shown and labelled. The flare feed (`/DONKI/FLR`) returned an error on 15 Nov 2026, so flares are taken from the links inside the particle-event records, which NASA adds after the event. Detections are from near-Earth and STEREO spacecraft; a crew on the way to Mars would be at a different place in the heliosphere.
+
 ## Measured in flight today
 
 Every numeric indicator in the tool is already measured in space. The app shows this under "How to measure" for each indicator (`src/core/flight.ts`). All entries were checked against the linked page on 14 Nov 2026.

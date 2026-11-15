@@ -3,6 +3,7 @@ import { HAZARDS, INDICATOR_BY_ID, describeInsight, missionOutlook, topLevel, wo
 import { formatDate } from '../format'
 import { useMission } from '../state'
 import ReportDialog from '../ReportDialog'
+import SpaceWeather from '../SpaceWeather'
 import { STATUS, StatusBadge } from '../status'
 
 const LEVEL = { 1: 'Self-care', 2: 'Crew Medical Officer', 3: 'Flight surgeon' } as const
@@ -346,6 +347,7 @@ export default function Today({ onOpenLog, onOpenBody, onOpenTrends }: { onOpenL
       onOpenTrends={onOpenTrends}
     >
       <Outlook items={missionOutlook(records, day, mission.plannedDays)} plannedDays={mission.plannedDays} />
+      <SpaceWeather env={mission.env} />
       <Hazards a={assessment} />
       <ReportDialog open={report} onClose={() => setReport(false)} />
     </TodayView>

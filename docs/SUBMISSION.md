@@ -24,13 +24,14 @@ On the International Space Station a flight surgeon is a few seconds away. On th
 - **Log.** A daily check-in: mood, energy and stress, twelve yes/no journal items, symptoms, and measurements. Blood pressure has a guided mode with timers, because a correct reading needs five minutes of rest and two readings.
 - **Crew.** An overview for the Crew Medical Officer, most urgent person first.
 - **Timeline.** Every mission day is one bar, coloured by that day's status, so the history of the mission is visible at a glance and any day can be reopened.
+- **Space weather.** Real NASA DONKI records of solar particle events, live and as replays of two real storms, with the warning time each storm gave and what is left of it after the link delay.
 - **Mission outlook.** Projections of cumulative radiation against the 600 mSv career limit, bone density put at risk by days without resistive exercise, sleep debt, and body mass at mission end.
 - **Ground report.** A complete SBAR message (situation, background, assessment, request) with all readings and the actions already started, ready to copy or save.
 - **Environments.** Space station, lunar base, Mars transit and Mars surface change the radiation background and the communication delay; the advice adapts (for example, "start now, the reply takes 20 minutes").
 
 ### How it works
 
-All health logic is deterministic TypeScript with tests (56). Nothing is computed by an AI model, so every number and recommendation can be traced to a rule and a cited threshold.
+All health logic is deterministic TypeScript with tests (60). Nothing is computed by an AI model, so every number and recommendation can be traced to a rule and a cited threshold.
 
 - A value is judged twice: against clinical reference ranges, and against the person's own 28-day baseline using a robust z-score. One unusual day is a prompt to look; sustained patterns are escalated.
 - "Not measured" is never shown as "fine". Missing data has its own state throughout.
@@ -40,7 +41,7 @@ All health logic is deterministic TypeScript with tests (56). Nothing is compute
 
 ### Data
 
-The demo uses a synthetic 120-day Mars transit for a crew of four, generated from a fixed seed. It contains a schedule shift that builds sleep debt and is followed by a fever, a cabin CO₂ excursion, a solar particle event, an exercise device outage, and a late-mission dip in mood and body mass. No real astronaut data is used.
+Space weather is real NASA data. The crew's health data is synthetic: the demo uses a 120-day Mars transit for a crew of four, generated from a fixed seed. It contains a schedule shift that builds sleep debt and is followed by a fever, a cabin CO₂ excursion, a solar particle event, an exercise device outage, and a late-mission dip in mood and body mass. No real astronaut data is used.
 
 ### What makes it different
 
@@ -57,6 +58,7 @@ It is a prototype for demonstration and education, not a medical device. Thresho
 
 NASA data and resources are the basis of the tool's rules, not an addition to them:
 
+- **NASA DONKI (Space Weather Database Of Notifications, Knowledge, Information), solar energetic particle events:** used live and as recorded data. The Space weather panel fetches the last 30 days from `api.nasa.gov/DONKI/SEP` and turns each record into a status for the crew (quiet, flare seen, forecast, particle storm) with the steps to take. Two real storms, 10 September 2017 and 13 May 2024, can be replayed minute by minute from NASA's own records: the tool moves from watch to shelter as the detections arrive. From the same records it computes how much warning each storm gave (50 minutes from flare to protons above 100 MeV on 10 September 2017) and how much of it is left after the one-way trip of an alert from Earth, which is the case for deciding on board.
 - **NASA Human Research Program, 5 Hazards of Human Spaceflight** and the HRP risk pages (sleep, cardiovascular, bone, behavioural, immune, nutrition, SANS, distance from Earth, radiation): they define which indicators are tracked, how body regions and hazards are grouped, and the content of the escalation rules.
 - **NASA-STD-3001** (Vol. 1 and 2) and the **NASA OCHMO technical briefs** on carbon dioxide and radiation protection: the 600 mSv career dose limit and the cabin CO₂ limits (3 mmHg 1-hour average, 2.5 mmHg 7-day average) are the thresholds the app uses.
 - **Mars Science Laboratory RAD measurements** (Zeitlin et al., Science 2013): the 1.8 mSv/day deep-space dose rate drives the radiation model and the end-of-mission projection.

@@ -7,6 +7,11 @@ import {
   evaluateIndicator,
   findFindings,
   findInsights,
+  parseDonki,
+  spaceWeatherAt,
+  warningTimes,
+  SEP_2017_09,
+  SEP_2024_05,
   buildGroundReport,
   generateMission,
   missionOutlook,
@@ -303,5 +308,44 @@ describe('demo mission', () => {
     expect(pairs).toContain('caffeineLate>sleep:false')
     expect(pairs).toContain('familyContact>mood:true')
     expect(pairs).toContain('privateTime>stress:true')
+  })
+})
+
+describe('space weather from NASA DONKI records', () => {
+  const env = ENVIRONMENT_BY_ID.marsTransit
+  const sept = parseDonki(SEP_2017_09)
+  const may = parseDonki(SEP_2024_05)
+  const at = (iso: string) => Date.parse(iso)
+
+  it('reads the real records', () => {
+    expect(sept).toHaveLength(9)
+    expect(may).toHaveLength(14)
+    expect(sept.filter((e) => e.kind === 'forecast')).toHaveLength(1)
+    expect(sept.find((e) => e.penetrating)!.instrument).toBe('GOES13: SEM/EPS >100 MeV')
+  })
+
+  it('is quiet before the storm, warns after the flare, and orders shelter when protons arrive', () => {
+    expect(spaceWeatherAt(sept, at('2017-09-03T00:00:00Z')).status).toBe('ok')
+    // X8.2 flare began 15:35; protons above 100 MeV were measured at 16:25.
+    const afterFlare = spaceWeatherAt(sept, at('2017-09-10T15:50:00Z'))
+    expect(afterFlare.status).toBe('watch')
+    expect(afterFlare.flareMs).toBe(at('2017-09-10T15:35:00Z'))
+    const storm = spaceWeatherAt(sept, at('2017-09-10T16:30:00Z'))
+    expect(storm.status).toBe('alert')
+    expect(storm.title).toContain('shelter now')
+    expect(spaceWeatherAt(sept, at('2017-09-20T00:00:00Z')).status).toBe('ok')
+  })
+
+  it('treats a model forecast as a watch, not an alarm', () => {
+    // 4 Sept 2017: the model alert came at 22:56, the first measurement at 23:52.
+    expect(spaceWeatherAt(sept, at('2017-09-04T23:00:00Z')).status).toBe('watch')
+    expect(spaceWeatherAt(sept, at('2017-09-04T23:55:00Z')).status).toBe('alert')
+  })
+
+  it('computes how much warning each storm gave and how much survives the link', () => {
+    const fastest = warningTimes(sept, env)[0]
+    expect(fastest.flareToProtonsMin).toBe(50)
+    expect(fastest.leftAfterLinkMin).toBe(40) // 10 min one-way delay on the transit
+    expect(warningTimes(may, env).some((w) => w.flareToProtonsMin === 60)).toBe(true)
   })
 })
