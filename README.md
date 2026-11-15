@@ -14,7 +14,7 @@ Health monitoring tool for astronauts on long-duration missions: daily journal +
 - **Teaches itself.** A first-visit guide shows a short walk-through and the same steps as text.
 - **Works with no link to Earth.** No backend: everything runs and is stored in the browser, and after the first visit the app opens offline.
 
-**Live app:** https://aquari5.github.io/crew-recovery/ · **Demo video:** [docs/demo.mp4](docs/demo.mp4)
+**Live app:** https://aquari5.github.io/crew-recovery/ · **Demo video:** https://aquari5.github.io/crew-recovery/demo.mp4
 
 The demo runs on a synthetic 120-day Mars transit with a crew of four. No real astronaut data is used.
 

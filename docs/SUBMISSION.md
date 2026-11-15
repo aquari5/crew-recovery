@@ -86,11 +86,11 @@ Yes. The project's code was written with Claude Code (Anthropic), under the dire
 ## Links for the form
 
 - **Link to Final Project:** https://aquari5.github.io/crew-recovery/ (live app) · source: https://github.com/aquari5/crew-recovery
-- **Link to Project Demo:** `docs/demo.mp4` in the repository. The guide asks for a public link that needs no login; upload the file to YouTube (unlisted or public) or use the GitHub file link, and test it in a private window.
+- **Link to Project Demo:** https://aquari5.github.io/crew-recovery/demo.mp4 (plays in the browser, no login). The file is `public/demo.mp4` in the repository.
 
 ## Demo video (29.6 seconds)
 
-`docs/demo.mp4`, 1920×1080, 60 fps, with voice-over and music, 29.6 s. The Project Submission Guide sets a hard limit of 30 seconds; a longer demo is not eligible for global judging. Team: **EZ Aqlimczak** (shown on the opening and closing cards).
+`public/demo.mp4`, 1920×1080, 60 fps, with voice-over and music, 29.6 s. The Project Submission Guide sets a hard limit of 30 seconds; a longer demo is not eligible for global judging. Team: **EZ Aqlimczak** (shown on the opening and closing cards).
 
 ### Voice-over
 

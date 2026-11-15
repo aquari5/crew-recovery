@@ -1,6 +1,6 @@
 # Places each spoken phrase on its scene and muxes the result under the film.
 # Run from the repository root, in an environment where `ffmpeg-static` is installed for node:
-#   python3 scripts/mix-audio.py demo silent-demo.mp4 docs/demo.mp4 [music file]
+#   python3 scripts/mix-audio.py demo silent-demo.mp4 public/demo.mp4 [music file]
 #   python3 scripts/mix-audio.py tour silent-tour.mp4 public/tour.mp4 [music file]
 # The chunk times were read off the recordings in docs/voice/ with ffmpeg's silencedetect.
 # The music file is not kept in this repository: its licence covers use in a video, not redistribution.

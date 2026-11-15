@@ -1,4 +1,4 @@
-// Records the two films: the 30-second demo (docs/demo.mp4) and the in-app
+// Records the two films: the 30-second demo (public/demo.mp4) and the in-app
 // walk-through (public/tour.mp4). Not part of the app. Run the dev server on
 // port 5183, then in a scratch folder `npm i playwright-core ffmpeg-static` and
 //   node record-demo.cjs demo out.mp4

@@ -87,11 +87,11 @@ This project is released under the MIT licence.
 
 ## Music
 
-"Spirit Molecule" by Filo Starquez is used under the voice in `docs/demo.mp4` and `public/tour.mp4`. The artist offers it as free to use; the credit line and licence from the download page are to be added here. The audio file itself is not included in this repository.
+"Spirit Molecule" by Filo Starquez is used under the voice in `public/demo.mp4` and `public/tour.mp4`. The artist offers it as free to use; the credit line and licence from the download page are to be added here. The audio file itself is not included in this repository.
 
 ## Use of AI tools
 
 - **Code:** written with Claude Code (Anthropic), under the direction and review of the team. An early draft of some interface code was written with Codex (OpenAI).
-- **Voice-over:** a recorded voice modulated with ElevenLabs, used in `docs/demo.mp4` and `public/tour.mp4`. This is also stated in the metadata of both video files and of the recordings in `docs/voice/`.
+- **Voice-over:** a recorded voice modulated with ElevenLabs, used in `public/demo.mp4` and `public/tour.mp4`. This is also stated in the metadata of both video files and of the recordings in `docs/voice/`.
 - **Videos:** captures of the real application; no part of the picture is generated imagery.
 - The application itself does not call any AI model: every number and recommendation is computed by deterministic, tested code.
